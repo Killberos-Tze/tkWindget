@@ -10,6 +10,9 @@ from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk
 from PIL import ImageTk, Image
 import os
 
+#we need load file element: that is a button with a label where the name of the file is displayed
+#we need load files and clear files element: two buttons with labellist with sliders
+
 
 class OnOffButton(Frame):
     def __init__(self,**kwargs):
