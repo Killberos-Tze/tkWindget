@@ -1,3 +1,4 @@
-__all__=['Rotate']
+__all__=['Rotate','OnOffButton']
 
 from tkWindget.tkWindget import Rotate
+from tkWindget.tkWindget import OnOffButton
