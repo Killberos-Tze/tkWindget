@@ -148,13 +148,13 @@ class AppFrame(Frame):
     
     def process_kwargs(self,**kwargs):
         if 'parent' not in kwargs:
-            self.approot=Tk()
-            kwargs['parent']=self.approot
+            kwargs['parent']=Tk()
         if 'appgeometry' not in kwargs:
             kwargs['appgeometry']=(100,100,10,10)
         return kwargs
 
     def init_start(self):
+        self.approot=Tk()
         self.pack(pady = (25,25), padx = (25,25))
         self.approot.title(str(self))
         self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
