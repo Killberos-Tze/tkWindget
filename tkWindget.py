@@ -138,23 +138,23 @@ class Rotate(Frame):
 class AppFrame(Frame):
     def __init__(self,**kwargs):
         kwargs=self.process_kwargs(**kwargs)
-        self.root=super().__init__(kwargs['parent'])
         self.appgeometry=kwargs['appgeometry']
-    
+        super().__init__(kwargs['parent'])
+        self.root=self
+        self.approot=kwargs['parent']
     
     def __str__(self):
         return 'Regular App Frame'
     
     def process_kwargs(self,**kwargs):
         if 'parent' not in kwargs:
-            self.approot=Tk()
-            kwargs['parent']=self.approot
+            kwargs['parent']=Tk()
         if 'appgeometry' not in kwargs:
             kwargs['appgeometry']=(100,100,10,10)
         return kwargs
 
     def init_start(self):
-        self.root.pack(pady = (25,25), padx = (25,25))
+        self.pack(pady = (25,25), padx = (25,25))
         self.approot.title(str(self))
         self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
         self.approot.mainloop
