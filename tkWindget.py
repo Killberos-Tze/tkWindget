@@ -135,6 +135,29 @@ class Rotate(Frame):
         self.choice.set(self.choice_list[idx])
         self.command(self.choice.get())
         
+class AppFrame(Frame):
+    def __init__(self,**kwargs):
+        kwargs=self.process_kwargs(**kwargs)
+        super().__init__(kwargs['parent'])
+        self.root=self
+    
+    
+    def __str__(self):
+        return 'Regular App Frame'
+    
+    def process_kwargs(self,**kwargs):
+        if 'parent' not in kwargs:
+            kwargs['parent']=Tk()
+            self.approot=kwargs['parent']
+        return kwargs
+
+    def init_start(self):
+        self.pack(pady = (25,25), padx = (25,25))
+        self.approot.title(str(self))
+        self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
+        self.approot.mainloop
+
+
 class Test_GUI():
     def __init__(self):
         self.root = Tk()
@@ -150,6 +173,7 @@ class Test_GUI():
         
     def init_start(self):
         self.root.mainloop()
+        
 
 if __name__=='__main__':
     Test_GUI().init_start()
