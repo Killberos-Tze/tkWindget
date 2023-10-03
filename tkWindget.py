@@ -157,7 +157,7 @@ class AppFrame(Frame):
         self.root.pack(pady = (25,25), padx = (25,25))
         self.approot.title(str(self))
         self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
-        self.approot.mainloop
+        self.approot.mainloop()
 
 
 class Test_GUI():
