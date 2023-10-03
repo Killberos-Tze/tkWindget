@@ -154,7 +154,7 @@ class AppFrame(Frame):
         return kwargs
 
     def init_start(self):
-        self.pack(pady = (25,25), padx = (25,25))
+        self.root.pack(pady = (25,25), padx = (25,25))
         self.approot.title(str(self))
         self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
         self.approot.mainloop
