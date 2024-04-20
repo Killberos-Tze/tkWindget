@@ -217,7 +217,7 @@ class AppFrame(Frame):
 
     def init_start(self):
         if self.approot!=None:
-            self.root.pack(pady = (25,25), padx = (25,25))
+            self.frameroot.pack(pady = (25,25), padx = (25,25))
             self.approot.title(str(self))
             self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
             self.approot.mainloop()
@@ -227,13 +227,13 @@ class Test_GUI(AppFrame):
     def __init__(self,**kwargs):
         super().__init__(appgeometry=(400, 400, 25, 25))
         self.approot.title("Windgets to see")
-        self.rotate=Rotate(parent=self.root,direction='horizontal')
+        self.rotate=Rotate(parent=self.frameroot,direction='horizontal')
         self.rotate.grid(row=0,column=1)
-        self.press=OnOffButton(parent=self.root)
+        self.press=OnOffButton(parent=self.frameroot)
         self.press.enable_press()
         self.press.grid(row=1,column=1)
         
-        self.loadfile=LoadDataFile(parent=self.root, width=24)
+        self.loadfile=LoadDataFile(parent=self.frameroot, width=24)
         self.loadfile._write_function=self.write_file
         self.loadfile.grid(row=2,column=1)
         
