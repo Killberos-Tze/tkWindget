@@ -207,7 +207,7 @@ class AppFrame(Frame):
             super().__init__(parent)
 
         self.appgeometry=appgeometry
-        self.root=self
+        self.frameroot=self
         
     
     def __str__(self):
