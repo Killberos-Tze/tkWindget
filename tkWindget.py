@@ -16,7 +16,7 @@ import os
 
 #we need load files and clear files element: two buttons with labellist with sliders
 
-
+#you need to add full list of kwargs in init
 class LoadDataFile(Frame):
     class container():
         pass
@@ -101,34 +101,23 @@ class LoadDataFile(Frame):
             kwargs['filetypes']=[("All files","*.*")]
         return kwargs
 
-
+#you need to add full list of kwargs in init 
 class OnOffButton(Frame):
-    def __init__(self,**kwargs):
-        kwargs=self.process_kwargs(**kwargs)
-        super().__init__(kwargs['parent'])
-        kwargs['parent']=self
-        self.command=kwargs['command']
+    def __init__(self,*args, parent=None, images=['on.png','off.png'], imagepath=os.path.join(os.path.dirname(__file__), 'images'), command=None, width=10):
+        if command==None:
+            command=self.placeholder
+        super().__init__(parent)
+        parent=self
+        self.command=command
         self.__state='off'
         self.__enable=False
         self.images={
-        'on':ImageTk.PhotoImage(Image.open(os.path.join(kwargs['imagepath'],kwargs['images'][0]))),
-        'off':ImageTk.PhotoImage(Image.open(os.path.join(kwargs['imagepath'],kwargs['images'][1])))
+        'on':ImageTk.PhotoImage(Image.open(os.path.join(imagepath,images[0]))),
+        'off':ImageTk.PhotoImage(Image.open(os.path.join(imagepath,images[1])))
             }
-        self.button=Button(kwargs['parent'], image=self.images[self.__state], command=self.execute_press)
+        self.button=Button(parent, image=self.images[self.__state], command=self.execute_press)
         self.button.pack()
         
-    def process_kwargs(self,**kwargs):
-        if 'parent' not in kwargs:
-            kwargs['parent']=None
-        if 'images' not in kwargs:
-            kwargs['images']=['on.png','off.png']#first on then off
-        if 'imagepath' not in kwargs:
-            kwargs['imagepath']=os.path.join(os.path.dirname(__file__), 'images')
-        if 'command' not in kwargs:
-            kwargs['command']=self.placeholder
-        if 'width' not in kwargs:
-            kwargs['width']=10
-        return kwargs
 
     def process_press(self):
         if self.__state=='off':
@@ -160,47 +149,32 @@ class OnOffButton(Frame):
         pass
 
 
-
+#you need to add full list of kwargs in init
 class Rotate(Frame):
-    def __init__(self,**kwargs):
-        kwargs=self.process_kwargs(**kwargs)
-        super().__init__(kwargs['parent'])
-        kwargs['parent']=self
-        self.choice=kwargs['typevar']
-        self.choice_list=kwargs['choice_list']
-        self.command=kwargs['command']
-        if kwargs['direction'] == 'horizontal' or kwargs['direction'] != 'vertical':
-            self.prepare_elements(0,180,**kwargs)
+    def __init__(self,*args, parent=None, typevar=StringVar, imagepath=os.path.join(os.path.dirname(__file__), 'images', "button.png"), choice_list=['a','b','c'], command=None, direction='horizontal', width=10):
+        if command==None:
+            command=self.placeholder
+        super().__init__(parent)
+        parent=self
+        self.choice=typevar()
+        self.choice_list=choice_list
+        self.command=command
+        if direction == 'horizontal' or direction != 'vertical':
+            self.prepare_elements(0,180,parent=parent,imagepath=imagepath,width=width)
             self.direction_horizontal()
         else:
-            self.prepare_elements(90,270,**kwargs)
+            self.prepare_elements(90,270,parent=parent,imagepath=imagepath,width=width)
             self.direction_vertical()
         self.choice.set(self.choice_list[0])
         
-    def process_kwargs(self,**kwargs):
-        if 'parent' not in kwargs:
-            kwargs['parent']=None
-        if 'typevar' not in kwargs:
-            kwargs['typevar']=StringVar()
-        if 'imagepath' not in kwargs:
-            kwargs['imagepath']=os.path.join(os.path.dirname(__file__), 'images', "button.png")
-        if 'choice_list' not in kwargs:
-            kwargs['choice_list']=['a','b','c']
-        if 'command' not in kwargs:
-            kwargs['command']=self.placeholder
-        if 'direction' not in kwargs:
-            kwargs['direction']='horizontal'
-        if 'width' not in kwargs:
-            kwargs['width']=10
-        return kwargs
-        
-    def prepare_elements(self,*args,**kwargs):
-        image = Image.open(kwargs['imagepath'])
+
+    def prepare_elements(self,*args, parent,imagepath,width):
+        image = Image.open(imagepath)
         self.imageminus=ImageTk.PhotoImage(image.rotate(args[0]))
         self.imageplus=ImageTk.PhotoImage(image.rotate(args[1]))
-        self.minus=Button(kwargs['parent'], image=self.imageminus,command=lambda lidx=-1: self.choice_change(lidx),bg='lightblue')
-        self.plus=Button(kwargs['parent'], image=self.imageplus,command=lambda lidx=+1: self.choice_change(lidx),bg='lightblue')
-        self.label=Label(kwargs['parent'], textvariable=self.choice, borderwidth=2,relief=GROOVE, width=kwargs['width'])
+        self.minus=Button(parent, image=self.imageminus,command=lambda lidx=-1: self.choice_change(lidx),bg='lightblue')
+        self.plus=Button(parent, image=self.imageplus,command=lambda lidx=+1: self.choice_change(lidx),bg='lightblue')
+        self.label=Label(parent, textvariable=self.choice, borderwidth=2,relief=GROOVE, width=width)
         
                 
     def placeholder(self,*args):
@@ -224,34 +198,34 @@ class Rotate(Frame):
         self.command(self.choice.get())
         
 class AppFrame(Frame):
-    def __init__(self,**kwargs):
-        kwargs=self.process_kwargs(**kwargs)
-        super().__init__(kwargs['parent'])
-        self.appgeometry=kwargs['appgeometry']
+    def __init__(self,parent=Tk, appgeometry= (200,200,10,10)):
+        if parent==Tk:
+            self.approot=Tk()    
+            super().__init__(self.approot)
+        else:
+            self.approot=None
+            super().__init__(parent)
+
+        self.appgeometry=appgeometry
         self.root=self
         
     
     def __str__(self):
         return 'Regular App Frame'
     
-    def process_kwargs(self,**kwargs):
-        if 'parent' not in kwargs:
-            kwargs['parent']=Tk()
-            self.approot=kwargs['parent']
-        if 'appgeometry' not in kwargs:
-            kwargs['appgeometry']=(200,200,10,10)
-        return kwargs
+
 
     def init_start(self):
-        self.root.pack(pady = (25,25), padx = (25,25))
-        self.approot.title(str(self))
-        self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
-        self.approot.mainloop()
+        if self.approot!=None:
+            self.root.pack(pady = (25,25), padx = (25,25))
+            self.approot.title(str(self))
+            self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
+            self.approot.mainloop()
 
 
 class Test_GUI(AppFrame):
     def __init__(self,**kwargs):
-        super().__init__(**kwargs,appgeometry=(400, 400, 25, 25))
+        super().__init__(appgeometry=(400, 400, 25, 25))
         self.approot.title("Windgets to see")
         self.rotate=Rotate(parent=self.root,direction='horizontal')
         self.rotate.grid(row=0,column=1)
