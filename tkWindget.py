@@ -200,7 +200,7 @@ class Rotate(Frame):
 class AppFrame(Frame):
     def __init__(self,parent=Tk, appgeometry= (200,200,10,10)):
         if parent==Tk:
-            self.approot=Tk()    
+            self.approot=parent()    
             super().__init__(self.approot)
         else:
             self.approot=None
