@@ -8,6 +8,8 @@ Created on Tue Feb 28 07:37:01 2023
 
 from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN
 from tkinter.filedialog import askopenfilename
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from PIL import ImageTk, Image
 import os
 #we need load file element: that is a button with a label where the name of the file is displayed
@@ -197,24 +199,43 @@ class Rotate(Frame):
         self.choice.set(self.choice_list[idx])
         self.command(self.choice.get())
         
+class FigureFrame(Frame):
+    def __init__(self,*args, parent=None, figclass=Figure,figsize=(8.5/2.54,6/2.54), axsize=(0.2,0.2,0.7,0.7)):
+        super().__init__(parent)
+        parent=self
+        
+        self.plot=figclass()
+        if figclass==Figure:    
+            self.plot.set_size_inches(figsize)
+            self.plot.myaxes=self.plot.add_axes(axsize)
+
+        self.canvas=FigureCanvasTkAgg(self.plot,master=parent)
+        self.canvas.get_tk_widget().grid(row=1,column=1)
+        toolbar = NavigationToolbar2Tk(self.canvas, parent, pack_toolbar=False)
+        toolbar.update()
+        toolbar.grid(row=2,column=1)
+        self.canvas.draw()
+        
+        
+    def __str__(self):
+        return 'Regular App Frame'
+        
 class AppFrame(Frame):
     def __init__(self,parent=Tk, appgeometry= (200,200,10,10)):
         if parent==Tk:
             self.approot=parent()    
             super().__init__(self.approot)
+            self.frameroot=self
+            self.appgeometry=appgeometry
         else:
-            self.approot=None
             super().__init__(parent)
-
-        self.appgeometry=appgeometry
-        self.frameroot=self
+            self.frameroot=self
+            self.approot=None
         
-    
+            
     def __str__(self):
         return 'Regular App Frame'
     
-
-
     def init_start(self):
         if self.approot!=None:
             self.frameroot.pack(pady = (25,25), padx = (25,25))
@@ -223,9 +244,9 @@ class AppFrame(Frame):
             self.approot.mainloop()
 
 
-class Test_GUI(AppFrame):
+class Test_App(AppFrame):
     def __init__(self,**kwargs):
-        super().__init__(appgeometry=(400, 400, 25, 25))
+        super().__init__(appgeometry=(400, 500, 25, 25))
         self.approot.title("Windgets to see")
         self.rotate=Rotate(parent=self.frameroot,direction='horizontal')
         self.rotate.grid(row=0,column=1)
@@ -237,6 +258,9 @@ class Test_GUI(AppFrame):
         self.loadfile._write_function=self.write_file
         self.loadfile.grid(row=2,column=1)
         
+        self.figure=FigureFrame(parent=self.frameroot)
+        self.figure.grid(row=3,column=1)
+        
         
     def write_file(self):
         variable="hey"
@@ -244,4 +268,4 @@ class Test_GUI(AppFrame):
         
 
 if __name__=='__main__':
-    Test_GUI().init_start()
+    Test_App().init_start()
