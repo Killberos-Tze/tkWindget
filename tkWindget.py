@@ -222,11 +222,11 @@ class FigureFrame(Frame):
         
 class AppFrame(Frame):
     def __init__(self,parent=Tk, appgeometry= (200,200,10,10)):
+        self.appgeometry=appgeometry
         if parent==Tk:
             self.approot=parent()    
             super().__init__(self.approot)
-            self.frameroot=self
-            self.appgeometry=appgeometry
+            self.frameroot=self  
         else:
             super().__init__(parent)
             self.frameroot=self
