@@ -6,7 +6,7 @@ Created on Tue Feb 28 07:37:01 2023
 @author: tze
 """
 
-from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN
+from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar
 from tkinter.filedialog import askopenfilename
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -18,7 +18,7 @@ import os
 
 #we need load files and clear files element: two buttons with labellist with sliders
 
-#you need to add full list of kwargs in init
+#this should be a single button where the title changes
 class LoadDataFile(Frame):
     class container():
         pass
@@ -219,6 +219,44 @@ class FigureFrame(Frame):
         
     def __str__(self):
         return 'Regular App Frame'
+    
+class StringEntry(Frame):
+    def __init__(self,*args, parent=None,typevar=StringVar,**kwargs):
+        super().__init__(parent)
+        parent=self
+        self.string=typevar()
+        self.stringEntry=Entry(self,textvariable=self.string,validate="key",selectbackground='#f00',**kwargs)
+        self.stringEntry['validatecommand']=(self.stringEntry.register(self.Check_input_string), '%P','%d')
+        self.stringEntry.grid(row=1,column=1)
+        
+    def Check_input_string(self,inStr,acttyp):
+        if acttyp == '1': #insert
+            try:
+                float(inStr)
+                return False
+            except:
+                return True #it returns only true of false allowing or not allwing the insert action
+        return True
+        
+
+class FloatEntry(Frame):
+    def __init__(self,*args, parent=None,typevar=DoubleVar,**kwargs):
+        super().__init__(parent)
+        parent=self
+        self.float=typevar()
+        self.floatEntry=Entry(self,textvariable=self.float,validate="key",selectbackground='#f00',**kwargs)
+        self.floatEntry['validatecommand']=(self.floatEntry.register(self.Check_input_float), '%P','%d')
+        self.floatEntry.grid(row=1,column=1)
+        
+    def Check_input_float(self,inStr,acttyp):
+        if acttyp == '1': #insert
+            try:
+                float(inStr)
+                if float(inStr)==0.:#this prevents that input string starts with zero so user can't set layer thickness to zero
+                    return False
+            except:
+                return False #it returns only true of false allowing or not allwing the insert action
+        return True
         
 class AppFrame(Frame):
     def __init__(self,parent=Tk, appgeometry= (200,200,10,10)):
@@ -246,7 +284,7 @@ class AppFrame(Frame):
 
 class Test_App(AppFrame):
     def __init__(self,**kwargs):
-        super().__init__(appgeometry=(400, 500, 25, 25))
+        super().__init__(appgeometry=(600, 500, 25, 25))
         self.approot.title("Windgets to see")
         self.rotate=Rotate(parent=self.frameroot,direction='horizontal')
         self.rotate.grid(row=0,column=1)
@@ -260,6 +298,12 @@ class Test_App(AppFrame):
         
         self.figure=FigureFrame(parent=self.frameroot)
         self.figure.grid(row=3,column=1)
+        
+        self.floatentry=FloatEntry(parent=self.frameroot)
+        self.floatentry.grid(row=1,column=2)
+        
+        self.stringentry=StringEntry(parent=self.frameroot)
+        self.stringentry.grid(row=2,column=2)
         
         
     def write_file(self):
