@@ -224,8 +224,8 @@ class StringEntry(Frame):
     def __init__(self,*args, parent=None,typevar=StringVar,**kwargs):
         super().__init__(parent)
         parent=self
-        self.string=typevar()
-        self.stringEntry=Entry(self,textvariable=self.string,validate="key",selectbackground='#f00',**kwargs)
+        self.var=typevar()
+        self.stringEntry=Entry(self,textvariable=self.var,validate="key",selectbackground='#f00',**kwargs)
         self.stringEntry['validatecommand']=(self.stringEntry.register(self.Check_input_string), '%P','%d')
         self.stringEntry.grid(row=1,column=1)
         
@@ -243,8 +243,8 @@ class FloatEntry(Frame):
     def __init__(self,*args, parent=None,typevar=DoubleVar,**kwargs):
         super().__init__(parent)
         parent=self
-        self.float=typevar()
-        self.floatEntry=Entry(self,textvariable=self.float,validate="key",selectbackground='#f00',**kwargs)
+        self.var=typevar()
+        self.floatEntry=Entry(self,textvariable=self.var,validate="key",selectbackground='#f00',**kwargs)
         self.floatEntry['validatecommand']=(self.floatEntry.register(self.Check_input_float), '%P','%d')
         self.floatEntry.grid(row=1,column=1)
         
@@ -262,8 +262,8 @@ class IntEntry(Frame):
     def __init__(self,*args, parent=None,typevar=IntVar,**kwargs):
         super().__init__(parent)
         parent=self
-        self.float=typevar()
-        self.floatEntry=Entry(self,textvariable=self.float,validate="key",selectbackground='#f00',**kwargs)
+        self.var=typevar()
+        self.floatEntry=Entry(self,textvariable=self.var,validate="key",selectbackground='#f00',**kwargs)
         self.floatEntry['validatecommand']=(self.floatEntry.register(self.Check_input_int), '%P','%d')
         self.floatEntry.grid(row=1,column=1)
         
