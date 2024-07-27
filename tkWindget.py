@@ -6,7 +6,7 @@ Created on Tue Feb 28 07:37:01 2023
 @author: tze
 """
 
-from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar
+from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar, IntVar
 from tkinter.filedialog import askopenfilename
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -254,6 +254,23 @@ class FloatEntry(Frame):
                 float(inStr)
                 if float(inStr)==0.:#this prevents that input string starts with zero so user can't set layer thickness to zero
                     return False
+            except:
+                return False #it returns only true of false allowing or not allwing the insert action
+        return True
+
+class IntEntry(Frame):
+    def __init__(self,*args, parent=None,typevar=IntVar,**kwargs):
+        super().__init__(parent)
+        parent=self
+        self.float=typevar()
+        self.floatEntry=Entry(self,textvariable=self.float,validate="key",selectbackground='#f00',**kwargs)
+        self.floatEntry['validatecommand']=(self.floatEntry.register(self.Check_input_int), '%P','%d')
+        self.floatEntry.grid(row=1,column=1)
+        
+    def Check_input_int(self,inStr,acttyp):
+        if acttyp == '1': #insert
+            try:
+                int(inStr)
             except:
                 return False #it returns only true of false allowing or not allwing the insert action
         return True
