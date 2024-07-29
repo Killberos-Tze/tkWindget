@@ -246,7 +246,7 @@ class FloatEntry(StringEntry):
     def __init__(self,*args, parent=None,typevar=DoubleVar,**kwargs):
         super().__init__(*args, parent=parent,typevar=typevar,**kwargs)
         
-    def Check_input_float(self,inStr,acttyp):
+    def Check_input(self,inStr,acttyp):
         if acttyp == '1': #insert
             try:
                 float(inStr)
@@ -286,7 +286,8 @@ class AppFrame(Frame):
     def __init__(self,parent=Tk, appgeometry= (200,200,10,10)):
         self.appgeometry=appgeometry
         if parent==Tk:
-            self.approot=parent()    
+            self.approot=parent()
+            self.approot.bind("<1>", lambda event: event.widget.focus_set())
             super().__init__(self.approot)
             self.frameroot=self  
         else:
