@@ -224,15 +224,15 @@ class StringEntry(Frame):
     def __init__(self,*args, parent=None,typevar=StringVar,**kwargs):
         super().__init__(parent)
         parent=self
-        if typevar==StringVar:
+        if typevar in [StringVar, DoubleVar, IntVar]:
             self.var=typevar()
         else:
             self.var=typevar
-        self.stringEntry=Entry(self,textvariable=self.var,validate="key",selectbackground='#f00',**kwargs)
-        self.stringEntry['validatecommand']=(self.stringEntry.register(self.Check_input_string), '%P','%d')
-        self.stringEntry.grid(row=1,column=1)
+        self.Entry=Entry(parent,textvariable=self.var,validate="key",selectbackground='#f00',**kwargs)
+        self.Entry['validatecommand']=(self.Entry.register(self.Check_input), '%P','%d')
+        self.Entry.grid(row=1,column=1)
         
-    def Check_input_string(self,inStr,acttyp):
+    def Check_input(self,inStr,acttyp):
         if acttyp == '1': #insert
             try:
                 float(inStr)
@@ -242,17 +242,9 @@ class StringEntry(Frame):
         return True
         
 
-class FloatEntry(Frame):
+class FloatEntry(StringEntry):
     def __init__(self,*args, parent=None,typevar=DoubleVar,**kwargs):
-        super().__init__(parent)
-        parent=self
-        if typevar==DoubleVar:
-            self.var=typevar()
-        else:
-            self.var=typevar
-        self.floatEntry=Entry(self,textvariable=self.var,validate="key",selectbackground='#f00',**kwargs)
-        self.floatEntry['validatecommand']=(self.floatEntry.register(self.Check_input_float), '%P','%d')
-        self.floatEntry.grid(row=1,column=1)
+        super().__init__(*args, parent=parent,typevar=typevar,**kwargs)
         
     def Check_input_float(self,inStr,acttyp):
         if acttyp == '1': #insert
@@ -264,19 +256,11 @@ class FloatEntry(Frame):
                 return False #it returns only true of false allowing or not allwing the insert action
         return True
 
-class IntEntry(Frame):
+class IntEntry(StringEntry):
     def __init__(self,*args, parent=None,typevar=IntVar,**kwargs):
-        super().__init__(parent)
-        parent=self
-        if typevar==IntVar:
-            self.var=typevar()
-        else:
-            self.var=typevar
-        self.floatEntry=Entry(self,textvariable=self.var,validate="key",selectbackground='#f00',**kwargs)
-        self.floatEntry['validatecommand']=(self.floatEntry.register(self.Check_input_int), '%P','%d')
-        self.floatEntry.grid(row=1,column=1)
-        
-    def Check_input_int(self,inStr,acttyp):
+        super().__init__(*args, parent=parent,typevar=typevar,**kwargs)
+
+    def Check_input(self,inStr,acttyp):
         if acttyp == '1': #insert
             try:
                 int(inStr)
@@ -284,6 +268,20 @@ class IntEntry(Frame):
                 return False #it returns only true of false allowing or not allwing the insert action
         return True
         
+class IPEntry(StringEntry):
+    def __init__(self,*args, parent=None,typevar=IntVar,inlen=3,**kwargs):
+        super().__init__(*args, parent=parent,typevar=typevar,**kwargs)
+        self.inlen=inlen
+    def Check_input(self,inStr,acttyp):
+        if acttyp == '1': #insert
+            try:
+                int(inStr)
+                if len(inStr)>self.inlen:
+                    return False
+            except:
+                return False #it returns only true of false allowing or not allwing the insert action
+        return True
+    
 class AppFrame(Frame):
     def __init__(self,parent=Tk, appgeometry= (200,200,10,10)):
         self.appgeometry=appgeometry
@@ -326,10 +324,13 @@ class Test_App(AppFrame):
         self.figure.grid(row=3,column=1)
         
         self.floatentry=FloatEntry(parent=self.frameroot)
-        self.floatentry.grid(row=1,column=2)
+        self.floatentry.grid(row=0,column=2)
         
         self.stringentry=StringEntry(parent=self.frameroot)
-        self.stringentry.grid(row=2,column=2)
+        self.stringentry.grid(row=1,column=2)
+        
+        self.intentry=IPEntry(parent=self.frameroot,inlen=4)
+        self.intentry.grid(row=2,column=2)
         
         
     def write_file(self):
