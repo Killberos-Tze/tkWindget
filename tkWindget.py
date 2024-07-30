@@ -268,7 +268,7 @@ class IntEntry(StringEntry):
                 return False #it returns only true of false allowing or not allwing the insert action
         return True
         
-class IPEntry(StringEntry):
+class IntLimEntry(StringEntry):
     def __init__(self,*args, parent=None,typevar=IntVar,inlen=3,**kwargs):
         super().__init__(*args, parent=parent,typevar=typevar,**kwargs)
         self.inlen=inlen
@@ -282,12 +282,69 @@ class IPEntry(StringEntry):
                 return False #it returns only true of false allowing or not allwing the insert action
         return True
     
+
+class IPEntry(Frame):
+    def __init__(self,*args,parent=None,address=None,**kwargs):
+        if parent!=None:
+            super().__init__(parent)
+        else:
+            super().__init__(*args,**kwargs)
+        parent=self
+        self.entry_list=[]
+        self.ipfields=[IntVar(),IntVar(),IntVar(),IntVar(),IntVar()]
+        
+        Label(parent,text="IP Address").grid(row=0,column=0,columnspan=6,sticky="W")
+        Label(parent,text="Port").grid(row=0,column=7,columnspan=2,sticky="W")
+        
+        
+        for i in range (0,7):
+            if i%2==0:
+                self.entry_list.append(IntLimEntry(parent=parent,typevar=self.ipfields[int(i/2)],width=3))
+                self.entry_list[-1].grid(row=1,column=i)
+            else:
+                Label(parent,text=".").grid(row=1,column=i)
+                
+        Label(parent,text=":").grid(row=1,column=7)
+        self.entry_list.append(IntLimEntry(parent=parent,typevar=self.ipfields[4],inlen=4,width=4))
+        self.entry_list[-1].grid(row=1,column=8)
+        
+        if address==None:
+            self.set_address("192.169.1.210")
+            self.set_port("5025")
+        else:
+            self.address_port(self,address)
+    
+    def set_address_port(self,string):
+        self.set_address(string.split(":")[0])
+        self.set_port(string.split(":")[1])
+    
+    def set_address(self,string):
+        ipfields=string.split(".")
+        for i in range(0,len(self.ipfields)-1):
+            self.ipfields[i].set(ipfields[i])
+    
+    def set_port(self,string):
+        self.ipfields[-1].set(string)
+        
+    def get_address(self):
+        out=""
+        for item in self.ipfields[0:3]:
+            out=out+str(item.get())+"."
+        out=out+str(self.ipfields[3].get())
+        return out
+    
+    def get_port(self):
+        return str(self.ipfields[-1].get())
+    
+    def get_address_port(self):
+        return self.get_address()+":"+self.get_port()
+        
+    
 class AppFrame(Frame):
     def __init__(self,parent=Tk, appgeometry= (200,200,10,10)):
         self.appgeometry=appgeometry
         if parent==Tk:
             self.approot=parent()
-            self.approot.bind("<1>", lambda event: event.widget.focus_set())
             super().__init__(self.approot)
             self.frameroot=self  
         else:
@@ -304,6 +361,7 @@ class AppFrame(Frame):
             self.frameroot.pack(pady = (25,25), padx = (25,25))
             self.approot.title(str(self))
             self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
+            self.approot.bind("<1>", lambda event: event.widget.focus_set())
             self.approot.mainloop()
 
 
@@ -341,3 +399,4 @@ class Test_App(AppFrame):
 
 if __name__=='__main__':
     Test_App().init_start()
+
