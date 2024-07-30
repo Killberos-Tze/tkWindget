@@ -321,10 +321,10 @@ class IPEntry(Frame):
     def set_address(self,string):
         ipfields=string.split(".")
         for i in range(0,len(self.ipfields)-1):
-            self.ipfields[i].set(ipfields[i])
+            self.ipfields[i].set(int(ipfields[i]))
     
     def set_port(self,string):
-        self.ipfields[-1].set(string)
+        self.ipfields[-1].set(int(string))
         
     def get_address(self):
         out=""
@@ -334,10 +334,10 @@ class IPEntry(Frame):
         return out
     
     def get_port(self):
-        return str(self.ipfields[-1].get())
+        return self.ipfields[-1].get()
     
     def get_address_port(self):
-        return self.get_address()+":"+self.get_port()
+        return self.get_address()+":"+str(self.get_port())
         
     
 class AppFrame(Frame):
