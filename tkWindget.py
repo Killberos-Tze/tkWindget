@@ -6,7 +6,7 @@ Created on Tue Feb 28 07:37:01 2023
 @author: tze
 """
 
-from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar, IntVar
+from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar, IntVar, DISABLED, ACTIVE
 from tkinter.filedialog import askopenfilename
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -232,6 +232,12 @@ class StringEntry(Frame):
         self.Entry['validatecommand']=(self.Entry.register(self.Check_input), '%P','%d')
         self.Entry.grid(row=1,column=1)
         
+    def disable(self):
+        self.Entry.config(state=DISABLED)
+        
+    def enable(self):
+        self.Entry.config(state=ACTIVE)
+        
     def Check_input(self,inStr,acttyp):
         if acttyp == '1': #insert
             try:
@@ -338,6 +344,14 @@ class IPEntry(Frame):
     
     def get_address_port(self):
         return self.get_address()+":"+str(self.get_port())
+    
+    def disable(self):
+        for item in self.entry_list:
+            item.disable()
+    
+    def enable(self):
+        for item in self.entry_list:
+            item.enable()
         
     
 class AppFrame(Frame):
