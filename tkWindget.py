@@ -6,7 +6,7 @@ Created on Tue Feb 28 07:37:01 2023
 @author: tze
 """
 
-from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar, IntVar, DISABLED, ACTIVE
+from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar, IntVar, DISABLED, NORMAL
 from tkinter.filedialog import askopenfilename
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -236,7 +236,7 @@ class StringEntry(Frame):
         self.Entry.config(state=DISABLED)
         
     def enable(self):
-        self.Entry.config(state=ACTIVE)
+        self.Entry.config(state=NORMAL)
         
     def Check_input(self,inStr,acttyp):
         if acttyp == '1': #insert
