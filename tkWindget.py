@@ -273,7 +273,7 @@ class IntEntry(StringEntry):
             except:
                 return False #it returns only true of false allowing or not allwing the insert action
         return True
-        
+#integer with limited number of digits        
 class IntLimEntry(StringEntry):
     def __init__(self,*args, parent=None,typevar=IntVar,inlen=3,**kwargs):
         super().__init__(*args, parent=parent,typevar=typevar,**kwargs)
