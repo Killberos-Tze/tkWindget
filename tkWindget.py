@@ -318,7 +318,7 @@ class IPEntry(Frame):
             self.set_address("192.168.1.210")
             self.set_port("5025")
         else:
-            self.address_port(self,address)
+            self.set_address_port(address)
     
     def set_address_port(self,string):
         self.set_address(string.split(":")[0])
