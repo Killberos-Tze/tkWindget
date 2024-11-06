@@ -315,7 +315,7 @@ class IPEntry(Frame):
         self.entry_list[-1].grid(row=1,column=8)
         
         if address==None:
-            self.set_address("192.168.1.210")
+            self.set_address("127.0.0.1")
             self.set_port("5025")
         else:
             self.set_address_port(address)
