@@ -102,6 +102,20 @@ class LoadDataFile(Frame):
         if 'filetypes' not in kwargs:
             kwargs['filetypes']=[("All files","*.*")]
         return kwargs
+    
+class NameLabel(Frame):
+    def __init__(self,*args, parent=None,width=10):
+        super().__init__(parent);
+        parent=self;
+        self.name=StringVar();
+        tmp=Label(parent, textvariable=self.name, borderwidth=2,relief=SUNKEN, width=width)
+        tmp.pack()
+    def set_name(self,string):
+        self.name.set(string);
+    def get_name(self):
+        return self.name.get();
+    def clear(self):
+        self.name.set("");
 
 #you need to add full list of kwargs in init 
 class OnOffButton(Frame):
@@ -404,6 +418,10 @@ class Test_App(AppFrame):
         
         self.intentry=IPEntry(parent=self.frameroot,inlen=4)
         self.intentry.grid(row=2,column=2)
+        
+        self.name=NameLabel(parent=self.frameroot,width=14)
+        self.name.set_name("What I want")
+        self.name.grid(row=3,column=2)
         
         
     def write_file(self):
