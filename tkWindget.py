@@ -104,11 +104,11 @@ class LoadDataFile(Frame):
         return kwargs
     
 class NameLabel(Frame):
-    def __init__(self,*args, parent=None,width=10):
+    def __init__(self,*args, parent=None,**kwargs):
         super().__init__(parent);
         parent=self;
         self.name=StringVar();
-        tmp=Label(parent, textvariable=self.name, borderwidth=2,relief=SUNKEN, width=width)
+        tmp=Label(parent, textvariable=self.name, borderwidth=2,relief=SUNKEN, **kwargs)
         tmp.pack()
     def set_name(self,string):
         self.name.set(string);
