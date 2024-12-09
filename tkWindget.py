@@ -119,27 +119,32 @@ class NameLabel(Frame):
 
 #you need to add full list of kwargs in init 
 class OnOffButton(Frame):
-    def __init__(self,*args, parent=None, images=['on.png','off.png'], imagepath=os.path.join(os.path.dirname(__file__), 'images'), command=None, width=10):
+    def __init__(self,*args, parent=None, images=['on.png','off.png'],imageon=None, imageoff=None, imagepath=os.path.join(os.path.dirname(__file__), 'images'), command=None, commandon=None, commandoff=None, width=10):
         if command==None:
             command=self.placeholder
+        if commandon==None:
+            commandon=self.placeholder
+        if commandoff==None:
+            commandoff=self.placeholder
         super().__init__(parent)
         parent=self
         self.command=command
+        self.commandon=commandon
+        self.commandoff=commandoff
         self.__state='off'
         self.__enable=False
         self.images={
         'on':ImageTk.PhotoImage(Image.open(os.path.join(imagepath,images[0]))),
         'off':ImageTk.PhotoImage(Image.open(os.path.join(imagepath,images[1])))
             }
+        if imageon!=None:
+            self.images['on']=ImageTk.PhotoImage(Image.open(os.path.join(imagepath,imageon)))
+        if imageoff!=None:
+            self.images['off']=ImageTk.PhotoImage(Image.open(os.path.join(imagepath,imageoff)))
+        
         self.button=Button(parent, image=self.images[self.__state], command=self.execute_press)
         self.button.pack()
         
-
-    def process_press(self):
-        if self.__state=='off':
-            self.__state='on'
-        elif self.__state=='on':
-            self.__state='off'
     
     def get_state(self):
         return self.__state
@@ -151,7 +156,12 @@ class OnOffButton(Frame):
                self.button.config(image=self.images[self.__state])
     def execute_press(self):
         if self.__enable:
-            self.process_press()
+            if self.__state=='off':
+                self.__state='on'
+                self.commandon()
+            elif self.__state=='on':
+                self.__state='off'
+                self.commandoff()
             self.button.config(image=self.images[self.__state])
             self.command()
             
