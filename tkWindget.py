@@ -224,11 +224,11 @@ class Rotate(Frame):
         self.command(self.choice.get())
         
 class FigureFrame(Frame):
-    def __init__(self,*args, parent=None, figclass=Figure,figsize=(8.5/2.54,6/2.54), axsize=(0.2,0.2,0.7,0.7)):
+    def __init__(self,*args, parent=None, figclass=Figure,figkwargs={},figsize=(8.5/2.54,6/2.54), axsize=(0.2,0.2,0.7,0.7)):
         super().__init__(parent)
         parent=self
         
-        self.plot=figclass()
+        self.plot=figclass(**figkwargs)
         if figclass==Figure:    
             self.plot.set_size_inches(figsize)
             self.plot.myaxes=self.plot.add_axes(axsize)
