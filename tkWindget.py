@@ -238,9 +238,13 @@ class FigureFrame(Frame):
         toolbar = NavigationToolbar2Tk(self.canvas, parent, pack_toolbar=False)
         toolbar.update()
         toolbar.grid(row=2,column=1)
-        self.canvas.draw()
-        
-        
+        if print(self.plot)=="v_draw":
+            self.plot.add_draw(self.canvas.draw)
+            self.plot.draw()
+        else:
+            self.canvas.draw()
+    
+    
     def __str__(self):
         return 'Regular App Frame'
     
