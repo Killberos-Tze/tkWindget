@@ -18,11 +18,11 @@ import os
 
 #we need load files and clear files element: two buttons with labellist with sliders
 
-#this should be a single button where the title changes
+#this can be removed soon
 class LoadDataFile(Frame):
     class container():
         pass
-    
+
     def __init__(self,**kwargs):
         self.filename=StringVar()
         kwargs=self.process_kwargs(**kwargs)
@@ -34,7 +34,7 @@ class LoadDataFile(Frame):
         self._write_function=kwargs['write_file']
         self._read_function=kwargs['read_file']
         self._action_function=kwargs['action']
-        
+
     def prepare_elements(self,*args,**kwargs):
         rowcount=1
         self.browse=Button(kwargs['parent'], text="Load file", command=lambda kwargs=kwargs : self.get_file(**kwargs))
@@ -45,7 +45,7 @@ class LoadDataFile(Frame):
         rowcount+=1
         self.filelabel=Label(kwargs['parent'], textvariable=self.filename, font='Courier',width=kwargs['width'], wraplength=240,justify='left',relief=SUNKEN,anchor='w')
         self.filelabel.grid(row=rowcount,column=1,columnspan=2,sticky='W')
-        
+
     def get_file(self,**kwargs):
         self.errormsg.set('')
         filename=askopenfilename(title="Select file", initialdir=kwargs['initialdir'], filetypes=kwargs['filetypes'])
@@ -64,20 +64,20 @@ class LoadDataFile(Frame):
             else:
                 self.filename.set('')
                 self.errormsg.set(tmp.error)
-        
+
     def default_read(self,filename):
         tmp=LoadDataFile.container()
         tmp.error='test'
         tmp.data=''
         tmp.setup=''
         return tmp
-    
+
     def default_write(self):
         pass
-    
+
     def default_action(self):
         pass
-    
+
     def process_kwargs(self,**kwargs):
         if 'parent' not in kwargs:
             kwargs['parent']=None
@@ -102,7 +102,23 @@ class LoadDataFile(Frame):
         if 'filetypes' not in kwargs:
             kwargs['filetypes']=[("All files","*.*")]
         return kwargs
-    
+
+class LabelButton(Frame):
+    def __init__(self,*args,**kwargs):
+        if "textvariable" in kwargs:
+            self.label=kwargs["textvariable"]
+        else:
+            self.label=StringVar()
+
+        kwargs.pop('textvariable')
+        super().__init__(*args,textvariable=self.label,**kwargs)
+
+    def set_label(self,text):
+        self.label.set(text)
+
+    def get_label(self):
+        return self.label.get()
+
 class NameLabel(Frame):
     def __init__(self,*args, parent=None,**kwargs):
         super().__init__(parent);
@@ -144,11 +160,10 @@ class OnOffButton(Frame):
         
         self.button=Button(parent, image=self.images[self.__state], command=self.execute_press)
         self.button.pack()
-        
-    
+
     def get_state(self):
         return self.__state
-    
+
     def change_state(self,*args):
         if args:
            if args[0]=='on' or args[0]=='off':
@@ -164,16 +179,15 @@ class OnOffButton(Frame):
                 self.commandoff()
             self.button.config(image=self.images[self.__state])
             self.command()
-            
+
     def enable_press(self):
         self.__enable=True
-    
+
     def disable_press(self):
         self.__enable=False
-    
+
     def placeholder(self,*args):
         pass
-
 
 #you need to add full list of kwargs in init
 class Rotate(Frame):
@@ -192,7 +206,6 @@ class Rotate(Frame):
             self.prepare_elements(90,270,parent=parent,imagepath=imagepath,width=width)
             self.direction_vertical()
         self.choice.set(self.choice_list[0])
-        
 
     def prepare_elements(self,*args, parent,imagepath,width):
         image = Image.open(imagepath)
@@ -201,33 +214,30 @@ class Rotate(Frame):
         self.minus=Button(parent, image=self.imageminus,command=lambda lidx=-1: self.choice_change(lidx),bg='lightblue')
         self.plus=Button(parent, image=self.imageplus,command=lambda lidx=+1: self.choice_change(lidx),bg='lightblue')
         self.label=Label(parent, textvariable=self.choice, borderwidth=2,relief=GROOVE, width=width)
-        
-                
+
     def placeholder(self,*args):
         pass
-    
+
     def direction_horizontal(self):
         self.minus.grid(row=1,column=1)
         self.label.grid(row=1,column=2)
         self.plus.grid(row=1,column=3)
-        
-    
+
     def direction_vertical(self):
         self.minus.grid(row=3,column=1)
         self.label.grid(row=2,column=1)
         self.plus.grid(row=1,column=1)
-        
-    
+
     def choice_change(self,idx):
         idx=(self.choice_list.index(self.choice.get())+idx) % len(self.choice_list)
         self.choice.set(self.choice_list[idx])
         self.command(self.choice.get())
-        
+
 class FigureFrame(Frame):
     def __init__(self,*args, parent=None, figclass=Figure,figkwargs={},figsize=(8.5/2.54,6/2.54), axsize=(0.2,0.2,0.7,0.7)):
         super().__init__(parent)
         parent=self
-        
+
         self.plot=figclass(**figkwargs)
         if figclass==Figure:    
             self.plot.set_size_inches(figsize)
@@ -243,11 +253,10 @@ class FigureFrame(Frame):
             self.plot.draw()
         else:
             self.canvas.draw()
-    
-    
+
     def __str__(self):
         return 'Regular App Frame'
-    
+
 class StringEntry(Frame):
     def __init__(self,*args, parent=None,typevar=StringVar,**kwargs):
         super().__init__(parent)
@@ -259,13 +268,13 @@ class StringEntry(Frame):
         self.Entry=Entry(parent,textvariable=self.var,validate="key",selectbackground='#f00',**kwargs)
         self.Entry['validatecommand']=(self.Entry.register(self.Check_input), '%P','%d')
         self.Entry.grid(row=1,column=1)
-        
+
     def disable(self):
         self.Entry.config(state=DISABLED)
-        
+
     def enable(self):
         self.Entry.config(state=NORMAL)
-        
+
     def Check_input(self,inStr,acttyp):
         if acttyp == '1': #insert
             try:
@@ -274,12 +283,12 @@ class StringEntry(Frame):
             except:
                 return True #it returns only true of false allowing or not allwing the insert action
         return True
-        
+
 
 class FloatEntry(StringEntry):
     def __init__(self,*args, parent=None,typevar=DoubleVar,**kwargs):
         super().__init__(*args, parent=parent,typevar=typevar,**kwargs)
-        
+
     def Check_input(self,inStr,acttyp):
         if acttyp == '1': #insert
             try:
@@ -315,10 +324,10 @@ class IntLimEntry(StringEntry):
             except:
                 return False #it returns only true of false allowing or not allwing the insert action
         return True
-    
+
 
 class IPEntry(Frame):
-    def __init__(self,*args,parent=None,address=None,**kwargs):
+    def __init__(self,*args,parent=None,address="None:None",**kwargs):
         if parent!=None:
             super().__init__(parent)
         else:
@@ -326,62 +335,60 @@ class IPEntry(Frame):
         parent=self
         self.entry_list=[]
         self.ipfields=[IntVar(),IntVar(),IntVar(),IntVar(),IntVar()]
-        
+
         Label(parent,text="IP Address").grid(row=0,column=0,columnspan=6,sticky="W")
         Label(parent,text="Port").grid(row=0,column=7,columnspan=2,sticky="W")
-        
-        
+
         for i in range (0,7):
             if i%2==0:
                 self.entry_list.append(IntLimEntry(parent=parent,typevar=self.ipfields[int(i/2)],width=3))
                 self.entry_list[-1].grid(row=1,column=i)
             else:
                 Label(parent,text=".").grid(row=1,column=i)
-                
+
         Label(parent,text=":").grid(row=1,column=7)
         self.entry_list.append(IntLimEntry(parent=parent,typevar=self.ipfields[4],inlen=4,width=4))
         self.entry_list[-1].grid(row=1,column=8)
-        
-        if address==None:
+
+        if address=="None:None":
             self.set_address("127.0.0.1")
             self.set_port("5025")
         else:
             self.set_address_port(address)
-    
+
     def set_address_port(self,string):
         self.set_address(string.split(":")[0])
         self.set_port(string.split(":")[1])
-    
+
     def set_address(self,string):
         ipfields=string.split(".")
         for i in range(0,len(self.ipfields)-1):
             self.ipfields[i].set(int(ipfields[i]))
-    
+
     def set_port(self,string):
         self.ipfields[-1].set(int(string))
-        
+
     def get_address(self):
         out=""
         for item in self.ipfields[0:3]:
             out=out+str(item.get())+"."
         out=out+str(self.ipfields[3].get())
         return out
-    
+
     def get_port(self):
         return self.ipfields[-1].get()
-    
+
     def get_address_port(self):
         return self.get_address()+":"+str(self.get_port())
-    
+
     def disable(self):
         for item in self.entry_list:
             item.disable()
-    
+
     def enable(self):
         for item in self.entry_list:
             item.enable()
-        
-    
+
 class AppFrame(Frame):
     def __init__(self,parent=Tk, appgeometry= (200,200,10,10)):
         self.appgeometry=appgeometry
@@ -393,11 +400,10 @@ class AppFrame(Frame):
             super().__init__(parent)
             self.frameroot=self
             self.approot=None
-        
-            
+
     def __str__(self):
         return 'Regular App Frame'
-    
+
     def init_start(self):
         if self.approot!=None:
             self.frameroot.pack(pady = (25,25), padx = (25,25))
@@ -416,32 +422,30 @@ class Test_App(AppFrame):
         self.press=OnOffButton(parent=self.frameroot)
         self.press.enable_press()
         self.press.grid(row=1,column=1)
-        
+
         self.loadfile=LoadDataFile(parent=self.frameroot, width=24)
         self.loadfile._write_function=self.write_file
         self.loadfile.grid(row=2,column=1)
-        
+
         self.figure=FigureFrame(parent=self.frameroot)
         self.figure.grid(row=3,column=1)
-        
+
         self.floatentry=FloatEntry(parent=self.frameroot)
         self.floatentry.grid(row=0,column=2)
-        
+
         self.stringentry=StringEntry(parent=self.frameroot)
         self.stringentry.grid(row=1,column=2)
-        
+
         self.intentry=IPEntry(parent=self.frameroot,inlen=4)
         self.intentry.grid(row=2,column=2)
-        
+
         self.name=NameLabel(parent=self.frameroot,width=14)
         self.name.set_name("What I want")
         self.name.grid(row=3,column=2)
-        
-        
+
     def write_file(self):
         variable="hey"
         print(variable)
-        
 
 if __name__=='__main__':
     Test_App().init_start()
