@@ -103,7 +103,7 @@ class LoadDataFile(Frame):
             kwargs['filetypes']=[("All files","*.*")]
         return kwargs
 
-class LabelButton(Frame):
+class LabelButton(Button):
     def __init__(self,*args,**kwargs):
         if "textvariable" in kwargs:
             self.label=kwargs["textvariable"]
