@@ -269,6 +269,9 @@ class StringEntry(Frame):
         self.Entry['validatecommand']=(self.Entry.register(self.Check_input), '%P','%d')
         self.Entry.grid(row=1,column=1)
 
+    def config(self,*args,**kwargs):
+        self.Entry.config(*args,**kwargs)
+
     def disable(self):
         self.Entry.config(state=DISABLED)
 
