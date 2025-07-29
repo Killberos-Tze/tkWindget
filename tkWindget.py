@@ -104,34 +104,56 @@ class LoadDataFile(Frame):
         return kwargs
 
 class LabelButton(Button):
-    def __init__(self,*args,**kwargs):
-        if "textvariable" in kwargs:
-            self.label=kwargs["textvariable"]
+    def __init__(self,*args,textvariable=StringVar,**kwargs):
+        if textvariable==StringVar:
+            self.var=textvariable()
         else:
-            self.label=StringVar()
+            self.var=textvariable
+        
+        if 'text' in kwargs:
+            self.default=kwargs['text']
+        else:
+            self.default=''
+        self.reset()
 
-        kwargs.pop('textvariable')
-        super().__init__(*args,textvariable=self.label,**kwargs)
+        super().__init__(*args,textvariable=self.var,**kwargs)
 
-    def set_label(self,text):
-        self.label.set(text)
+    def set_var(self,text):
+        self.var.set(text)
 
-    def get_label(self):
-        return self.label.get()
+    def get_var(self):
+        return self.var.get()
+    
+    def clear(self):
+        self.var.set("");
+    def reset(self):
+        self.var.set(self.default);
 
-class NameLabel(Frame):
-    def __init__(self,*args, parent=None,**kwargs):
+
+class LabelFrame(Frame):
+    def __init__(self,*args, parent=None, textvariable=StringVar, borderwidth=2,relief=SUNKEN,**kwargs):
         super().__init__(parent);
         parent=self;
-        self.name=StringVar();
-        tmp=Label(parent, textvariable=self.name, borderwidth=2,relief=SUNKEN, **kwargs)
+        if textvariable==StringVar:
+            self.var=textvariable()
+        else:
+            self.var=textvariable
+        if 'text' in kwargs:
+            self.default=kwargs['text']
+        else:
+            self.default=''
+        self.reset()
+            
+        tmp=Label(parent, textvariable=self.var, borderwidth=borderwidth, relief=relief,**kwargs)
         tmp.pack()
-    def set_name(self,string):
-        self.name.set(string);
-    def get_name(self):
-        return self.name.get();
+    def set_var(self,string):
+        self.var.set(string);
+    def get_var(self):
+        return self.var.get();
     def clear(self):
-        self.name.set("");
+        self.var.set("");
+    def reset(self):
+        self.var.set(self.default);
 
 #you need to add full list of kwargs in init 
 class OnOffButton(Frame):
@@ -258,16 +280,31 @@ class FigureFrame(Frame):
         return 'Regular App Frame'
 
 class StringEntry(Frame):
-    def __init__(self,*args, parent=None,typevar=StringVar,**kwargs):
+    def __init__(self,*args, parent=None,textvariable=StringVar,validate="key",selectbackground='#f00',**kwargs):
         super().__init__(parent)
         parent=self
-        if typevar in [StringVar, DoubleVar, IntVar]:
-            self.var=typevar()
+        if textvariable in [StringVar, DoubleVar, IntVar]:
+            self.var=textvariable()
         else:
-            self.var=typevar
-        self.Entry=Entry(parent,textvariable=self.var,validate="key",selectbackground='#f00',**kwargs)
+            self.var=textvariable
+        if 'text' in kwargs:
+            self.default=kwargs['text']
+        else:
+            self.default=''
+        self.reset()
+        
+        self.Entry=Entry(parent,textvariable=self.var,validate=validate,selectbackground=selectbackground,**kwargs)
         self.Entry['validatecommand']=(self.Entry.register(self.Check_input), '%P','%d')
         self.Entry.grid(row=1,column=1)
+
+    def set_var(self,string):
+        self.var.set(string);
+    def get_var(self):
+        return self.var.get();
+    def clear(self):
+        self.var.set("");
+    def reset(self):
+        self.var.set(self.default);
 
     def config(self,*args,**kwargs):
         self.Entry.config(*args,**kwargs)
@@ -289,8 +326,8 @@ class StringEntry(Frame):
 
 
 class FloatEntry(StringEntry):
-    def __init__(self,*args, parent=None,typevar=DoubleVar,**kwargs):
-        super().__init__(*args, parent=parent,typevar=typevar,**kwargs)
+    def __init__(self,*args, parent=None,textvariable=DoubleVar,**kwargs):
+        super().__init__(*args, parent=parent,textvariable=textvariable,**kwargs)
 
     def Check_input(self,inStr,acttyp):
         if acttyp == '1': #insert
@@ -303,8 +340,8 @@ class FloatEntry(StringEntry):
         return True
 
 class IntEntry(StringEntry):
-    def __init__(self,*args, parent=None,typevar=IntVar,**kwargs):
-        super().__init__(*args, parent=parent,typevar=typevar,**kwargs)
+    def __init__(self,*args, parent=None,textvariable=IntVar,**kwargs):
+        super().__init__(*args, parent=parent,textvariable=textvariable,**kwargs)
 
     def Check_input(self,inStr,acttyp):
         if acttyp == '1': #insert
@@ -315,8 +352,8 @@ class IntEntry(StringEntry):
         return True
 #integer with limited number of digits        
 class IntLimEntry(StringEntry):
-    def __init__(self,*args, parent=None,typevar=IntVar,inlen=3,**kwargs):
-        super().__init__(*args, parent=parent,typevar=typevar,**kwargs)
+    def __init__(self,*args, parent=None,textvariable=IntVar,inlen=3,**kwargs):
+        super().__init__(*args, parent=parent,textvariable=textvariable,**kwargs)
         self.inlen=inlen
     def Check_input(self,inStr,acttyp):
         if acttyp == '1': #insert
@@ -344,13 +381,13 @@ class IPEntry(Frame):
 
         for i in range (0,7):
             if i%2==0:
-                self.entry_list.append(IntLimEntry(parent=parent,typevar=self.ipfields[int(i/2)],width=3))
+                self.entry_list.append(IntLimEntry(parent=parent,textvariable=self.ipfields[int(i/2)],width=3))
                 self.entry_list[-1].grid(row=1,column=i)
             else:
                 Label(parent,text=".").grid(row=1,column=i)
 
         Label(parent,text=":").grid(row=1,column=7)
-        self.entry_list.append(IntLimEntry(parent=parent,typevar=self.ipfields[4],inlen=4,width=4))
+        self.entry_list.append(IntLimEntry(parent=parent,textvariable=self.ipfields[4],inlen=4,width=4))
         self.entry_list[-1].grid(row=1,column=8)
 
         if address=="None:None":
