@@ -112,6 +112,7 @@ class LabelButton(Button):
         
         if 'text' in kwargs:
             self.default=kwargs['text']
+            kwargs['text'].pop()
         else:
             self.default=''
         self.reset()
@@ -140,6 +141,7 @@ class LabelFrame(Frame):
             self.var=textvariable
         if 'text' in kwargs:
             self.default=kwargs['text']
+            kwargs['text'].pop()
         else:
             self.default=''
         self.reset()
@@ -289,6 +291,7 @@ class StringEntry(Frame):
             self.var=textvariable
         if 'text' in kwargs:
             self.default=kwargs['text']
+            kwargs['text'].pop()
         else:
             self.default=''
         self.reset()
