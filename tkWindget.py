@@ -42,6 +42,9 @@ class LoadSingleFile(Frame):
     def _placeholder(self):
         pass
     
+    def get_data(self):#it returns the pointer
+        return self.data
+    
     def clear(self):
         self.labelbutton.reset()
         self.data={}
