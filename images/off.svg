@@ -7,7 +7,7 @@
    viewBox="0 0 16 9"
    version="1.1"
    id="svg5"
-   inkscape:version="1.2.2 (1:1.2.2+202212051550+b0a8486541)"
+   inkscape:version="1.4 (1:1.4+202410151213+e7c3feb100)"
    sodipodi:docname="off.svg"
    inkscape:export-filename="off.png"
    inkscape:export-xdpi="96"
@@ -28,8 +28,8 @@
      showgrid="false"
      width="5mm"
      inkscape:zoom="3.5939236"
-     inkscape:cx="2.0868557"
-     inkscape:cy="36.867784"
+     inkscape:cx="48.136805"
+     inkscape:cy="37.006908"
      inkscape:window-width="1366"
      inkscape:window-height="710"
      inkscape:window-x="0"
@@ -39,27 +39,89 @@
      inkscape:showpageshadow="2"
      inkscape:deskcolor="#d1d1d1" />
   <defs
-     id="defs2" />
+     id="defs2">
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Drop Shadow"
+       id="filter2"
+       x="-0.093079161"
+       y="-0.1699977"
+       width="1.2507966"
+       height="1.4580494">
+      <feFlood
+         result="flood"
+         in="SourceGraphic"
+         flood-opacity="1.000000"
+         flood-color="rgb(0,0,0)"
+         id="feFlood1" />
+      <feGaussianBlur
+         result="blur"
+         in="SourceGraphic"
+         stdDeviation="0.300000"
+         id="feGaussianBlur1" />
+      <feOffset
+         result="offset"
+         in="blur"
+         dx="0.500000"
+         dy="0.500000"
+         id="feOffset1" />
+      <feComposite
+         result="comp1"
+         operator="in"
+         in="flood"
+         in2="offset"
+         id="feComposite1" />
+      <feComposite
+         result="fbSourceGraphic"
+         operator="over"
+         in="SourceGraphic"
+         in2="comp1"
+         id="feComposite2" />
+      <feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix2" />
+      <feFlood
+         id="feFlood2"
+         result="flood"
+         in="fbSourceGraphic"
+         flood-opacity="1.000000"
+         flood-color="rgb(0,0,0)" />
+      <feGaussianBlur
+         id="feGaussianBlur2"
+         result="blur"
+         in="fbSourceGraphic"
+         stdDeviation="0.300000" />
+      <feOffset
+         id="feOffset2"
+         result="offset"
+         in="blur"
+         dx="0.500000"
+         dy="0.500000" />
+      <feComposite
+         id="feComposite3"
+         result="comp1"
+         operator="in"
+         in="flood"
+         in2="offset" />
+      <feComposite
+         id="feComposite4"
+         result="comp2"
+         operator="over"
+         in="fbSourceGraphic"
+         in2="comp1" />
+    </filter>
+  </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <g
-       id="g1493">
-      <path
-         id="rect1109"
-         style="fill:#cecece;stroke-width:0.529166;stroke-linecap:round;stroke-linejoin:bevel"
-         d="M 0,0 H 15.470703 V 8.4707031 H 0 Z"
-         sodipodi:nodetypes="ccccc" />
-      <g
-         id="rect361">
-        <path
-           style="color:#000000;fill:#000000;stroke-linecap:square;stroke-linejoin:round"
-           d="M 15.470703,0 V 8.4707031 H 0 L 0.52929707,8.9999999 16,9 V 0.52929688 Z"
-           id="path1411"
-           sodipodi:nodetypes="ccccccc" />
-      </g>
-    </g>
+    <path
+       id="rect1109-6"
+       style="fill:#cecece;stroke-width:0.529166;stroke-linecap:round;stroke-linejoin:bevel;filter:url(#filter2)"
+       d="M 0,0 H 15.470703 V 8.470703 H 0 Z"
+       sodipodi:nodetypes="ccccc" />
     <text
        xml:space="preserve"
        style="font-size:3.52778px;line-height:1;font-family:'Accanthis ADF Std';-inkscape-font-specification:'Accanthis ADF Std, Normal';stroke-width:0.264583"

@@ -11,6 +11,7 @@ from tkinter.filedialog import askopenfilename
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from PIL import ImageTk, Image
+from RW_data.RW_files import Write_to, Read_from
 import os
 #we need load file element: that is a button with a label where the name of the file is displayed
 #here we need to send the refrerence to error message, stringvar for display, we keep name and dir name of the loaded file, we need to send the command how to read the file, arrangement should always be vertical
@@ -18,90 +19,62 @@ import os
 
 #we need load files and clear files element: two buttons with labellist with sliders
 
-#this can be removed soon
-class LoadDataFile(Frame):
-    class container():
-        pass
+#this is only for loading data files
+class LoadSingleFile(Frame):
 
-    def __init__(self,**kwargs):
-        self.filename=StringVar()
-        kwargs=self.process_kwargs(**kwargs)
-        super().__init__(kwargs['parent'])
-        kwargs['parent']=self
-        self.prepare_elements(**kwargs)
-        self.errormsg=kwargs['ErrorVar']
-        #self.init_dir=kwargs['initialdir']
-        self._write_function=kwargs['write_file']
-        self._read_function=kwargs['read_file']
-        self._action_function=kwargs['action']
+    def __init__(self,*args,parent=None,ini,write_ini=Write_to.ini_inst_proj,read=Read_from.ihtm,action=None,filetypes=[("All files","*.*")],**kwargs):
+        super().__init__(parent)
+        self.parent=self
+        self._init_references(ini,write_ini,read,action,filetypes)
+        self.prepare_elements(filetypes,**kwargs)
+        
+        
+    def _init_references(self,ini,write_ini,read,action,filetypes):
+        self._filetypes=filetypes
+        self._write_ini=write_ini
+        self._ini=ini
+        self._read=read
+        if action==None:
+            self._action=self._placeholder
+        else:
+            self._action=action
+
+    def _placeholder(self):
+        pass
+    
+    def clear(self):
+        self.labelbutton.reset()
+        self.data={}
+        
+    def reset(self):
+        self.labelbutton.reset()
 
     def prepare_elements(self,*args,**kwargs):
-        rowcount=1
-        self.browse=Button(kwargs['parent'], text="Load file", command=lambda kwargs=kwargs : self.get_file(**kwargs))
-        self.browse.grid(row=rowcount,column=1,sticky='W')
-        rowcount+=1
-        self.titlelabel=Label(kwargs['parent'], font='Courier',width=24,text=kwargs['text'],anchor='w')
-        self.titlelabel.grid(row=rowcount,column=1,columnspan=2,sticky='W')
-        rowcount+=1
-        self.filelabel=Label(kwargs['parent'], textvariable=self.filename, font='Courier',width=kwargs['width'], wraplength=240,justify='left',relief=SUNKEN,anchor='w')
-        self.filelabel.grid(row=rowcount,column=1,columnspan=2,sticky='W')
+        self.labelbutton=LabelButton(self.parent, font='Courier',command=self.get_file,**kwargs)
+        self.labelbutton.grid(row=1,column=1)
 
     def get_file(self,**kwargs):
-        self.errormsg.set('')
-        filename=askopenfilename(title="Select file", initialdir=kwargs['initialdir'], filetypes=kwargs['filetypes'])
+        self.reset()
+        filename=askopenfilename(title="Select file", initialdir=self._ini['load_file_path'], filetypes=self._filetypes)
         if filename:#to check if anything has been read out
             #change the folder where to look for the files
-            tmp=self._read_function(filename)
-            if tmp.error=='':
-                self.filename.set(os.path.basename(filename))
-                self.filedir=os.path.dirname(filename)
-                self._write_function()
-                if tmp.data:
-                    self.data=tmp.data
-                if tmp.setup:
-                    self.setup=tmp.setup
-                self._action_function()
+            self.data=self._read(filename)
+            if self.data['error']=='':
+                self.labelbutton.set_var(os.path.basename(filename))
+                self._ini['load_file_path']=os.path.dirname(filename)
+                self._write_ini()
+                self._action()
             else:
-                self.filename.set('')
-                self.errormsg.set(tmp.error)
+                self.labelbutton.set_var(self.data['error'])
 
-    def default_read(self,filename):
-        tmp=LoadDataFile.container()
-        tmp.error='test'
-        tmp.data=''
-        tmp.setup=''
-        return tmp
+    def config(self,*args,**kwargs):
+        self.labelbutton.config(*args,**kwargs)
 
-    def default_write(self):
-        pass
+    def disable(self):
+        self.labelbutton.config(state=DISABLED)
 
-    def default_action(self):
-        pass
-
-    def process_kwargs(self,**kwargs):
-        if 'parent' not in kwargs:
-            kwargs['parent']=None
-        if 'text' not in kwargs:
-            kwargs['text']='Loaded whatever:'
-        if 'read_func' not in kwargs:
-            kwargs['read_file']=self.default_read
-        if 'write_file' not in kwargs:
-            kwargs['write_file']=self.default_write
-        if 'action' not in kwargs:
-            kwargs['action']=self.default_action
-        if 'width' not in kwargs:
-            kwargs['width']=12
-        if 'title' not in kwargs:
-            kwargs['title']='Select file'
-        if 'initialdir' not in kwargs:
-            #initialdir should be a reference to a stringvar from main program
-            kwargs['initialdir']=StringVar()
-            kwargs['initialdir'].set('Documents')
-        if 'ErrorVar' not in kwargs:
-            kwargs['ErrorVar']=self.filename
-        if 'filetypes' not in kwargs:
-            kwargs['filetypes']=[("All files","*.*")]
-        return kwargs
+    def enable(self):
+        self.labelbutton.config(state=NORMAL)
 
 class LabelButton(Button):
     def __init__(self,*args,textvariable=StringVar,**kwargs):
@@ -144,10 +117,11 @@ class LabelFrame(Frame):
             kwargs.pop('text')
         else:
             self.default=''
-        self.reset()
-            
         tmp=Label(parent, textvariable=self.var, borderwidth=borderwidth, relief=relief,**kwargs)
         tmp.pack()
+        self.reset()
+        
+        
     def set_var(self,string):
         self.var.set(string);
     def get_var(self):
@@ -167,7 +141,7 @@ class OnOffButton(Frame):
         if commandoff==None:
             commandoff=self.placeholder
         super().__init__(parent)
-        parent=self
+        self.parent=self
         self.command=command
         self.commandon=commandon
         self.commandoff=commandoff
@@ -182,8 +156,8 @@ class OnOffButton(Frame):
         if imageoff!=None:
             self.images['off']=ImageTk.PhotoImage(Image.open(os.path.join(imagepath,imageoff)))
         
-        self.button=Button(parent, image=self.images[self.__state], command=self.execute_press)
-        self.button.pack()
+        self.button=Button(self.parent, image=self.images[self.__state], command=self.execute_press)
+        self.button.grid(row=1,column=1)
 
     def get_state(self):
         return self.__state
@@ -212,6 +186,21 @@ class OnOffButton(Frame):
 
     def placeholder(self,*args):
         pass
+    
+class CheckBox(OnOffButton):
+    def __init__(self,*args, text='', textvariable=StringVar, orientation='EW',**kwargs):
+        super().__init__(*args,imageon='box_on.png', imageoff='box_off.png',**kwargs)
+        self.label=LabelFrame(parent=self.parent,text=text,textvariable=textvariable)
+        if orientation=='WE':
+            self.label.grid(row=1,column=0)
+        elif orientation=='NS':
+            self.label.grid(row=2,column=1)
+        elif orientation=='SN':
+            self.label.grid(row=0,column=1)
+        else:
+            self.label.grid(row=1,column=2)
+        self.enable_press()
+    
 
 #you need to add full list of kwargs in init
 class Rotate(Frame):
@@ -443,6 +432,13 @@ class AppFrame(Frame):
             super().__init__(parent)
             self.frameroot=self
             self.approot=None
+        self.ini=Read_from.ini_inst(__file__)
+        if self.ini['error']:
+            self.ini={}
+            self.ini['save_file_path']='Document'
+            self.ini['ref_file_path']='Documents'
+            self.ini['load_file_path']='Documents'
+            self.write_ini()
 
     def __str__(self):
         return 'Regular App Frame'
@@ -454,11 +450,16 @@ class AppFrame(Frame):
             self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
             self.approot.bind("<1>", lambda event: event.widget.focus_set())
             self.approot.mainloop()
+            
+    def write_ini(self):
+        tmp=self.ini.pop('error')
+        Write_to.ini_inst_proj(__file__,self.ini)
+        self.ini['error']=tmp
 
 
 class Test_App(AppFrame):
     def __init__(self,**kwargs):
-        super().__init__(appgeometry=(600, 500, 25, 25))
+        super().__init__(appgeometry=(600, 550, 25, 25))
         self.approot.title("Windgets to see")
         self.rotate=Rotate(parent=self.frameroot,direction='horizontal')
         self.rotate.grid(row=0,column=1)
@@ -466,8 +467,7 @@ class Test_App(AppFrame):
         self.press.enable_press()
         self.press.grid(row=1,column=1)
 
-        self.loadfile=LoadDataFile(parent=self.frameroot, width=24)
-        self.loadfile._write_function=self.write_file
+        self.loadfile=LoadSingleFile(parent=self.frameroot,ini=self.ini, write_ini=self.write_ini, action=self.extra,  text='Load file', filetypes=[('Text files','*.txt')], width=24)
         self.loadfile.grid(row=2,column=1)
 
         self.figure=FigureFrame(parent=self.frameroot)
@@ -482,13 +482,21 @@ class Test_App(AppFrame):
         self.intentry=IPEntry(parent=self.frameroot,inlen=4)
         self.intentry.grid(row=2,column=2)
 
-        self.name=NameLabel(parent=self.frameroot,width=14)
-        self.name.set_name("What I want")
+        self.name=LabelFrame(parent=self.frameroot,width=14)
+        self.name.set_var("What I want")
         self.name.grid(row=3,column=2)
+        
+        self.checkbox=CheckBox(parent=self.frameroot,text='Random',commandon=self.on,commandoff=self.off)
+        self.checkbox.grid(row=4,column=2)
 
-    def write_file(self):
-        variable="hey"
-        print(variable)
+    def extra(self):
+        print(self.loadfile.data)        
+
+    def on(self):
+        self.checkbox.label.set_var("It's on!")
+        
+    def off(self):
+        self.checkbox.label.set_var("It's off!")
 
 if __name__=='__main__':
     Test_App().init_start()
