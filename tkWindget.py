@@ -425,7 +425,7 @@ class IPEntry(Frame):
             item.enable()
 
 class AppFrame(Frame):
-    def __init__(self,parent=Tk, appgeometry= (200,200,10,10)):
+    def __init__(self,parent=Tk, file='', appgeometry= (200,200,10,10)):
         self.appgeometry=appgeometry
         if parent==Tk:
             self.approot=parent()
@@ -435,7 +435,7 @@ class AppFrame(Frame):
             super().__init__(parent)
             self.frameroot=self
             self.approot=None
-        self.ini=Read_from.ini_inst(__file__)
+        self.ini=Read_from.ini_inst(file)
         if self.ini['error']:
             self.ini={}
             self.ini['save_file_path']='Document'
