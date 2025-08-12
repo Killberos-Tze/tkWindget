@@ -22,18 +22,19 @@ import os
 #this is only for loading data files
 class LoadSingleFile(Frame):
 
-    def __init__(self,*args,parent=None,ini,write_ini=Write_to.ini_inst_proj,read=Read_from.ihtm,action=None,filetypes=[("All files","*.*")],**kwargs):
+    def __init__(self,*args,parent=None,ini,write_ini=Write_to.ini_inst_proj,read=Read_from.ihtm,action=None,path='load_file_path',filetypes=[("All files","*.*")],**kwargs):
         super().__init__(parent)
-        self.parent=self
-        self._init_references(ini,write_ini,read,action,filetypes)
-        self.prepare_elements(filetypes,**kwargs)
+        self._parent=self
+        self._init_references(ini,write_ini,read,action,filetypes,path)
+        self._prepare_elements(**kwargs)
         
         
-    def _init_references(self,ini,write_ini,read,action,filetypes):
+    def _init_references(self,ini,write_ini,read,action,filetypes,path):
         self._filetypes=filetypes
         self._write_ini=write_ini
         self._ini=ini
         self._read=read
+        self._path=path
         if action==None:
             self._action=self._placeholder
         else:
@@ -52,13 +53,13 @@ class LoadSingleFile(Frame):
     def reset(self):
         self.labelbutton.reset()
 
-    def prepare_elements(self,*args,**kwargs):
-        self.labelbutton=LabelButton(self.parent, font='Courier',command=self.get_file,**kwargs)
+    def _prepare_elements(self,*args,**kwargs):
+        self.labelbutton=LabelButton(self._parent, font='Courier',command=self._get_file,**kwargs)
         self.labelbutton.grid(row=1,column=1)
 
-    def get_file(self,**kwargs):
+    def _get_file(self,**kwargs):
         self.reset()
-        filename=askopenfilename(title="Select file", initialdir=self._ini['load_file_path'], filetypes=self._filetypes)
+        filename=askopenfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes)
         if filename:#to check if anything has been read out
             #change the folder where to look for the files
             self.data=self._read(filename)
