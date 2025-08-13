@@ -54,7 +54,7 @@ class LoadSingleFile(Frame):
         self.labelbutton.reset()
 
     def _prepare_elements(self,*args,**kwargs):
-        self.labelbutton=LabelButton(self._parent, font='Courier',command=self._get_file,**kwargs)
+        self.labelbutton=LabelButton(self._parent, font=('Courier',10),command=self._get_file,**kwargs)
         self.labelbutton.grid(row=1,column=1)
 
     def _get_file(self,**kwargs):
@@ -65,7 +65,7 @@ class LoadSingleFile(Frame):
             self.data=self._read(filename)
             if self.data['error']=='':
                 self.labelbutton.set_var(os.path.basename(filename))
-                self._ini['load_file_path']=os.path.dirname(filename)
+                self._ini[self._path]=os.path.dirname(filename)
                 self._write_ini()
                 self._action()
             else:
