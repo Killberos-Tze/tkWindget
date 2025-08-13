@@ -437,6 +437,7 @@ class AppFrame(Frame):
             self.frameroot=self
             self.approot=None
         self.ini=Read_from.ini_inst(file)
+        self.file=file
         if self.ini['error']:
             self.ini={}
             self.ini['save_file_path']='Document'
@@ -457,7 +458,7 @@ class AppFrame(Frame):
             
     def write_ini(self):
         tmp=self.ini.pop('error')
-        Write_to.ini_inst_proj(__file__,self.ini)
+        Write_to.ini_inst_proj(self.file,self.ini)
         self.ini['error']=tmp
 
 
