@@ -213,7 +213,7 @@ class Rotate(Frame):
             command=self.placeholder
         super().__init__(parent)
         parent=self
-        self.choice=typevar()
+        self.var=typevar()
         self.choice_list=choice_list
         self.command=command
         if direction == 'horizontal' or direction != 'vertical':
@@ -222,7 +222,7 @@ class Rotate(Frame):
         else:
             self.prepare_elements(90,270,parent=parent,imagepath=imagepath,width=width)
             self.direction_vertical()
-        self.choice.set(self.choice_list[0])
+        self.var.set(self.choice_list[0])
 
     def prepare_elements(self,*args, parent,imagepath,width):
         image = Image.open(imagepath)
@@ -230,7 +230,7 @@ class Rotate(Frame):
         self.imageplus=ImageTk.PhotoImage(image.rotate(args[1]))
         self.minus=Button(parent, image=self.imageminus,command=lambda lidx=-1: self.choice_change(lidx),bg='lightblue')
         self.plus=Button(parent, image=self.imageplus,command=lambda lidx=+1: self.choice_change(lidx),bg='lightblue')
-        self.label=Label(parent, textvariable=self.choice, borderwidth=2,relief=GROOVE, width=width)
+        self.label=Label(parent, textvariable=self.var, borderwidth=2,relief=GROOVE, width=width)
 
     def placeholder(self,*args):
         pass
@@ -246,9 +246,14 @@ class Rotate(Frame):
         self.plus.grid(row=1,column=1)
 
     def choice_change(self,idx):
-        idx=(self.choice_list.index(self.choice.get())+idx) % len(self.choice_list)
-        self.choice.set(self.choice_list[idx])
-        self.command(self.choice.get())
+        idx=(self.choice_list.index(self.var.get())+idx) % len(self.choice_list)
+        self.var.set(self.choice_list[idx])
+        self.command(self.var.get())
+
+    def set_var(self,value):
+        self.var.set(value);
+    def get_var(self):
+        return self.var.get();
 
 class FigureFrame(Frame):
     def __init__(self,*args, parent=None, figclass=Figure,figkwargs={},figsize=(8.5/2.54,6/2.54), axsize=(0.2,0.2,0.7,0.7)):
