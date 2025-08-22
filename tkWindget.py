@@ -13,7 +13,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from PIL import ImageTk, Image
 from RW_data.RW_files import Write_to, Read_from
 import os
-from Figures.Figures import FigureXY2
 #we need load file element: that is a button with a label where the name of the file is displayed
 #here we need to send the refrerence to error message, stringvar for display, we keep name and dir name of the loaded file, we need to send the command how to read the file, arrangement should always be vertical
 #button, label label text, label with filename
@@ -481,47 +480,3 @@ class AppFrame(Frame):
         self.ini['error']=tmp
 
 
-class Test_App(AppFrame):
-    def __init__(self,**kwargs):
-        super().__init__(**kwargs,file=__file__,appgeometry=(700, 550, 25, 25))
-        self.approot.title("Windgets to see")
-        self.rotate=Rotate(parent=self.frameroot,direction='horizontal')
-        self.rotate.grid(row=0,column=1)
-        self.press=OnOffButton(parent=self.frameroot)
-        self.press.enable_press()
-        self.press.grid(row=1,column=1)
-
-        self.loadfile=LoadSingleFile(parent=self.frameroot,ini=self.ini, write_ini=self.write_ini,  text='Load file', filetypes=[('Text files','*.txt')], width=24)
-        self.loadfile.add_action(self.extra)
-        self.loadfile.grid(row=2,column=1)
-
-        self.figure=FigureFrame(parent=self.frameroot,figclass=FigureXY2)
-        self.figure.grid(row=3,column=1)
-
-        self.floatentry=FloatEntry(parent=self.frameroot)
-        self.floatentry.grid(row=0,column=2)
-
-        self.stringentry=StringEntry(parent=self.frameroot)
-        self.stringentry.grid(row=1,column=2)
-
-        self.intentry=IPEntry(parent=self.frameroot,inlen=4)
-        self.intentry.grid(row=2,column=2)
-
-        self.name=LabelFrame(parent=self.frameroot,width=14)
-        self.name.set_var("What I want")
-        self.name.grid(row=3,column=2)
-
-        self.checkbox=CheckBox(parent=self.frameroot,text='Random',commandon=self.on,commandoff=self.off)
-        self.checkbox.grid(row=4,column=2)
-
-    def extra(self):
-        print(self.loadfile.get_data())
-
-    def on(self):
-        self.checkbox.label.set_var("It's on!")
-
-    def off(self):
-        self.checkbox.label.set_var("It's off!")
-
-if __name__=='__main__':
-    Test_App().init_start()
