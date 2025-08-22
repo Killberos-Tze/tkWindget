@@ -13,6 +13,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from PIL import ImageTk, Image
 from RW_data.RW_files import Write_to, Read_from
 import os
+from Figures.Figures import FigureXY2
 #we need load file element: that is a button with a label where the name of the file is displayed
 #here we need to send the refrerence to error message, stringvar for display, we keep name and dir name of the loaded file, we need to send the command how to read the file, arrangement should always be vertical
 #button, label label text, label with filename
@@ -22,54 +23,65 @@ import os
 #this is only for loading data files
 class LoadSingleFile(Frame):
 
-    def __init__(self,*args,parent=None,ini,write_ini=Write_to.ini_inst_proj,read=Read_from.ihtm,action=None,path='load_file_path',filetypes=[("All files","*.*")],**kwargs):
+    def __init__(self,*args,parent=None,ini,write_ini=Write_to.ini_inst_proj,read=Read_from.ihtm,path='load_file_path',filetypes=[("All files","*.*")],**kwargs):
         super().__init__(parent)
         self._parent=self
-        self._init_references(ini,write_ini,read,action,filetypes,path)
+        self._init_references(ini,write_ini,read,filetypes,path)
         self._prepare_elements(**kwargs)
-        
-        
-    def _init_references(self,ini,write_ini,read,action,filetypes,path):
+        if self._path=='ref_file_path' and 'ref_file_name' in self._ini:
+            if self._ini['ref_file_name']!='':
+                self._load_data(os.path.join(self._ini['ref_file_path'],self._ini['ref_file_name']))
+    #it has to be added separately 
+    def add_action(self,action):
+        self._action=action
+
+    def _init_references(self,ini,write_ini,read,filetypes,path):
         self._filetypes=filetypes
         self._write_ini=write_ini
         self._ini=ini
         self._read=read
         self._path=path
-        if action==None:
-            self._action=self._placeholder
-        else:
-            self._action=action
 
-    def _placeholder(self):
+    def _action(self):
         pass
-    
+
     def get_data(self):#it returns the pointer
         return self.data
-    
-    def clear(self):
-        self.labelbutton.reset()
-        self.data={}
-        
+
     def reset(self):
+        self.reset_label()
+        self.reset_data()
+    
+    def reset_data(self):
+        self.data=None
+        
+    def reset_label(self):
         self.labelbutton.reset()
 
     def _prepare_elements(self,*args,**kwargs):
         self.labelbutton=LabelButton(self._parent, font=('Courier',10),command=self._get_file,**kwargs)
         self.labelbutton.grid(row=1,column=1)
 
+    def _load_data(self,filename):
+        self.data=self._read(filename)
+        if self.data['error']=='':
+            self.labelbutton.set_var(os.path.basename(filename))
+            self._ini[self._path]=os.path.dirname(filename)
+            if self._path=='ref_file_path':
+                self._ini['ref_file_name']=os.path.basename(filename)
+            self._write_ini()
+            self._action()
+        else:
+            self.labelbutton.set_var(self.data['error'])
+
     def _get_file(self,**kwargs):
-        self.reset()
+        self.reset_label()
         filename=askopenfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes)
         if filename:#to check if anything has been read out
             #change the folder where to look for the files
-            self.data=self._read(filename)
-            if self.data['error']=='':
-                self.labelbutton.set_var(os.path.basename(filename))
-                self._ini[self._path]=os.path.dirname(filename)
-                self._write_ini()
-                self._action()
-            else:
-                self.labelbutton.set_var(self.data['error'])
+            self._load_data(filename)
+        else:
+            self.reset_data()
 
     def config(self,*args,**kwargs):
         self.labelbutton.config(*args,**kwargs)
@@ -86,7 +98,7 @@ class LabelButton(Button):
             self.var=textvariable()
         else:
             self.var=textvariable
-        
+
         if 'text' in kwargs:
             self.default=kwargs['text']
             kwargs.pop('text')
@@ -101,7 +113,7 @@ class LabelButton(Button):
 
     def get_var(self):
         return self.var.get()
-    
+
     def clear(self):
         self.var.set("");
     def reset(self):
@@ -124,8 +136,8 @@ class LabelFrame(Frame):
         tmp=Label(parent, textvariable=self.var, borderwidth=borderwidth, relief=relief,**kwargs)
         tmp.pack()
         self.reset()
-        
-        
+
+
     def set_var(self,string):
         self.var.set(string);
     def get_var(self):
@@ -204,7 +216,6 @@ class CheckBox(OnOffButton):
         else:
             self.label.grid(row=1,column=2)
         self.enable_press()
-    
 
 #you need to add full list of kwargs in init
 class Rotate(Frame):
@@ -255,6 +266,8 @@ class Rotate(Frame):
     def get_var(self):
         return self.var.get();
 
+
+
 class FigureFrame(Frame):
     def __init__(self,*args, parent=None, figclass=Figure,figkwargs={},figsize=(8.5/2.54,6/2.54), axsize=(0.2,0.2,0.7,0.7)):
         super().__init__(parent)
@@ -271,8 +284,8 @@ class FigureFrame(Frame):
         toolbar.update()
         toolbar.grid(row=2,column=1)
         if str(self.plot)=="v_draw":
-            self.plot.add_draw(self.canvas.draw)
-            self.plot.draw()
+            self.plot.add_canvas(self.canvas)
+            self.plot.canvasdraw()
         else:
             self.canvas.draw()
 
@@ -293,7 +306,7 @@ class StringEntry(Frame):
         else:
             self.default=''
         self.reset()
-        
+
         self.Entry=Entry(parent,textvariable=self.var,validate=validate,selectbackground=selectbackground,**kwargs)
         self.Entry['validatecommand']=(self.Entry.register(self.Check_input), '%P','%d')
         self.Entry.grid(row=1,column=1)
@@ -431,7 +444,7 @@ class IPEntry(Frame):
             item.enable()
 
 class AppFrame(Frame):
-    def __init__(self,parent=Tk, file='', appgeometry= (200,200,10,10)):
+    def __init__(self, file, parent=Tk, appgeometry= (200,200,10,10)):
         self.appgeometry=appgeometry
         if parent==Tk:
             self.approot=parent()
@@ -445,6 +458,7 @@ class AppFrame(Frame):
         self.file=file
         if self.ini['error']:
             self.ini={}
+            self.ini['error']=''
             self.ini['save_file_path']='Document'
             self.ini['ref_file_path']='Documents'
             self.ini['load_file_path']='Documents'
@@ -460,7 +474,7 @@ class AppFrame(Frame):
             self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
             self.approot.bind("<1>", lambda event: event.widget.focus_set())
             self.approot.mainloop()
-            
+
     def write_ini(self):
         tmp=self.ini.pop('error')
         Write_to.ini_inst_proj(self.file,self.ini)
@@ -469,7 +483,7 @@ class AppFrame(Frame):
 
 class Test_App(AppFrame):
     def __init__(self,**kwargs):
-        super().__init__(appgeometry=(600, 550, 25, 25))
+        super().__init__(**kwargs,file=__file__,appgeometry=(700, 550, 25, 25))
         self.approot.title("Windgets to see")
         self.rotate=Rotate(parent=self.frameroot,direction='horizontal')
         self.rotate.grid(row=0,column=1)
@@ -477,10 +491,11 @@ class Test_App(AppFrame):
         self.press.enable_press()
         self.press.grid(row=1,column=1)
 
-        self.loadfile=LoadSingleFile(parent=self.frameroot,ini=self.ini, write_ini=self.write_ini, action=self.extra,  text='Load file', filetypes=[('Text files','*.txt')], width=24)
+        self.loadfile=LoadSingleFile(parent=self.frameroot,ini=self.ini, write_ini=self.write_ini,  text='Load file', filetypes=[('Text files','*.txt')], width=24)
+        self.loadfile.add_action(self.extra)
         self.loadfile.grid(row=2,column=1)
 
-        self.figure=FigureFrame(parent=self.frameroot)
+        self.figure=FigureFrame(parent=self.frameroot,figclass=FigureXY2)
         self.figure.grid(row=3,column=1)
 
         self.floatentry=FloatEntry(parent=self.frameroot)
@@ -495,19 +510,18 @@ class Test_App(AppFrame):
         self.name=LabelFrame(parent=self.frameroot,width=14)
         self.name.set_var("What I want")
         self.name.grid(row=3,column=2)
-        
+
         self.checkbox=CheckBox(parent=self.frameroot,text='Random',commandon=self.on,commandoff=self.off)
         self.checkbox.grid(row=4,column=2)
 
     def extra(self):
-        print(self.loadfile.data)        
+        print(self.loadfile.get_data())
 
     def on(self):
         self.checkbox.label.set_var("It's on!")
-        
+
     def off(self):
         self.checkbox.label.set_var("It's off!")
 
 if __name__=='__main__':
     Test_App().init_start()
-
