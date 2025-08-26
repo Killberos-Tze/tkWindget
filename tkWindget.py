@@ -91,7 +91,11 @@ class LoadSingleFile(Frame):
 
     def enable(self):
         self.labelbutton.config(state=NORMAL)
-
+        
+class SaveSingleFile(LoadSingleFile):
+    def __init__(self,*args,write=Write_to.data,filetypes=[("E60 tab sep file","*.dtsp")],**kwargs):
+        super().__init__(*args,filetypes,path='save_file_path',**kwargs)
+        
 class LabelButton(Button):
     def __init__(self,*args,textvariable=StringVar,**kwargs):
         if textvariable==StringVar:
@@ -245,12 +249,12 @@ class CheckBox(OnOffButton):
 
 #you need to add full list of kwargs in init
 class Rotate(Frame):
-    def __init__(self,*args, parent=None, typevar=StringVar, imagepath=os.path.join(os.path.dirname(__file__), 'images', "button.png"), choice_list=['a','b','c'], command=None, direction='horizontal', width=10):
+    def __init__(self,*args, parent=None, textvariable=StringVar, imagepath=os.path.join(os.path.dirname(__file__), 'images', "button.png"), choice_list=['a','b','c'], command=None, direction='horizontal', width=10):
         if command==None:
             command=self.placeholder
         super().__init__(parent)
         parent=self
-        self.var=typevar()
+        self.var=textvariable()
         self.choice_list=choice_list
         self.command=command
         if direction == 'horizontal' or direction != 'vertical':
