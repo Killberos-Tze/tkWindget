@@ -25,12 +25,13 @@ class LoadSingleFile(Frame):
     def __init__(self,*args,parent=None,ini,write_ini=Write_to.ini_inst_proj,read=Read_from.ihtm,path='load_file_path',filetypes=[("All files","*.*")],**kwargs):
         super().__init__(parent)
         self._parent=self
+        self.reset_data()
         self._init_references(ini,write_ini,read,filetypes,path)
         self._prepare_elements(**kwargs)
         if self._path=='ref_file_path' and 'ref_file_name' in self._ini:
             if self._ini['ref_file_name']!='':
                 self._load_data(os.path.join(self._ini['ref_file_path'],self._ini['ref_file_name']))
-    #it has to be added separately 
+    #action that has to be done if data is loaded or not loaded it has to check if data is there or not
     def add_action(self,action):
         self._action=action
 
@@ -69,18 +70,18 @@ class LoadSingleFile(Frame):
             if self._path=='ref_file_path':
                 self._ini['ref_file_name']=os.path.basename(filename)
             self._write_ini()
-            self._action()
         else:
             self.labelbutton.set_var(self.data['error'])
+            self.reset_data()
 
     def _get_file(self,**kwargs):
         self.reset_label()
         filename=askopenfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes)
         if filename:#to check if anything has been read out
-            #change the folder where to look for the files
             self._load_data(filename)
         else:
             self.reset_data()
+        self._action()
 
     def config(self,*args,**kwargs):
         self.labelbutton.config(*args,**kwargs)
@@ -157,11 +158,12 @@ class OnOffButton(Frame):
             commandoff=self.placeholder
         super().__init__(parent)
         self.parent=self
+        self._imagepath=imagepath
         self.command=command
         self.commandon=commandon
         self.commandoff=commandoff
-        self.__state='off'
-        self.__enable=False
+        self._state='off'
+        self._enable=False
         self.images={
         'on':ImageTk.PhotoImage(Image.open(os.path.join(imagepath,images[0]))),
         'off':ImageTk.PhotoImage(Image.open(os.path.join(imagepath,images[1])))
@@ -171,33 +173,40 @@ class OnOffButton(Frame):
         if imageoff!=None:
             self.images['off']=ImageTk.PhotoImage(Image.open(os.path.join(imagepath,imageoff)))
         
-        self.button=Button(self.parent, image=self.images[self.__state], command=self.execute_press)
+        self.button=Button(self.parent, image=self.images[self._state], command=self.execute_press)
         self.button.grid(row=1,column=1)
 
+    def on_off_config(self,state):
+        self.button.config(state=state)
+
     def get_state(self):
-        return self.__state
+        return self._state
 
     def change_state(self,*args):
         if args:
            if args[0]=='on' or args[0]=='off':
-               self.__state=args[0]
-               self.button.config(image=self.images[self.__state])
+               self._state=args[0]
+               self.button.config(image=self.images[self._state])
+
     def execute_press(self):
-        if self.__enable:
-            if self.__state=='off':
-                self.__state='on'
+        if self._enable:
+            if self._state=='off':
+                self._state='on'
                 self.commandon()
-            elif self.__state=='on':
-                self.__state='off'
+            elif self._state=='on':
+                self._state='off'
                 self.commandoff()
-            self.button.config(image=self.images[self.__state])
+            self.button.config(image=self.images[self._state])
             self.command()
 
     def enable_press(self):
-        self.__enable=True
+        self._enable=True
 
     def disable_press(self):
-        self.__enable=False
+        self._enable=False
+
+    def is_enabled(self):
+        return self._enable
 
     def placeholder(self,*args):
         pass
@@ -205,6 +214,8 @@ class OnOffButton(Frame):
 class CheckBox(OnOffButton):
     def __init__(self,*args, text='', textvariable=StringVar, orientation='EW',**kwargs):
         super().__init__(*args,imageon='box_on.png', imageoff='box_off.png',**kwargs)
+        self.images['on_disabled']=ImageTk.PhotoImage(Image.open(os.path.join(self._imagepath,'box_on_disabled.png')))
+        self.images['off_disabled']=ImageTk.PhotoImage(Image.open(os.path.join(self._imagepath,'box_off_disabled.png')))
         self.label=LabelFrame(parent=self.parent,text=text,textvariable=textvariable)
         if orientation=='WE':
             self.label.grid(row=1,column=0)
@@ -215,6 +226,22 @@ class CheckBox(OnOffButton):
         else:
             self.label.grid(row=1,column=2)
         self.enable_press()
+
+    def change_state(self,*args):
+        if args:
+            if args[0]=='on' or args[0]=='off':
+                self._state=args[0]
+                if self._enable:
+                    self.button.config(image=self.images[self._state])
+                else:
+                    self.button.config(image=self.images[self._state+'_disabled'])
+
+    def enable_press(self):
+        self._enable=True
+        self.button.config(image=self.images[self._state])
+    def disable_press(self):
+        self._enable=False
+        self.button.config(image=self.images[self._state+'_disabled'])
 
 #you need to add full list of kwargs in init
 class Rotate(Frame):
