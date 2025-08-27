@@ -101,6 +101,7 @@ class SaveSingleFile(LoadSingleFile):
         filename=asksaveasfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes, initialfile=f'{self._filename}.dtsp')
         if filename:#to check if anything has been read out
             self._write_file(filename)
+            self._ini[self._path]=os.path.dirname(filename)
 
     def add_filename(self,filename):
         self._filename=filename
