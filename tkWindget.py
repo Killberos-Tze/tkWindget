@@ -102,6 +102,7 @@ class SaveSingleFile(LoadSingleFile):
         if filename:#to check if anything has been read out
             self._write_file(filename)
             self._ini[self._path]=os.path.dirname(filename)
+            self._write_ini()
 
     def add_filename(self,filename):
         self._filename=filename
