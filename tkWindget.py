@@ -7,7 +7,7 @@ Created on Tue Feb 28 07:37:01 2023
 """
 
 from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar, IntVar, DISABLED, NORMAL
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename,asksaveasfilename
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from PIL import ImageTk, Image
@@ -74,7 +74,7 @@ class LoadSingleFile(Frame):
             self.labelbutton.set_var(self.data['error'])
             self.reset_data()
 
-    def _get_file(self,**kwargs):
+    def _get_file(self):
         self.reset_label()
         filename=askopenfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes)
         if filename:#to check if anything has been read out
@@ -94,7 +94,16 @@ class LoadSingleFile(Frame):
         
 class SaveSingleFile(LoadSingleFile):
     def __init__(self,*args,write=Write_to.data,filetypes=[("E60 tab sep file","*.dtsp")],**kwargs):
-        super().__init__(*args,filetypes,path='save_file_path',**kwargs)
+        super().__init__(*args,filetypes=filetypes,path='save_file_path',**kwargs)
+        self._write_file=write
+    def _get_file(self,**kwargs):
+        self.reset_label()
+        filename=asksaveasfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes, initialfile=f'{self._filename}.dtsp')
+        if filename:#to check if anything has been read out
+            self._write_file(filename)
+
+    def add_filename(self,filename):
+        self._filename=filename
         
 class LabelButton(Button):
     def __init__(self,*args,textvariable=StringVar,**kwargs):
