@@ -103,6 +103,7 @@ class SaveSingleFile(LoadSingleFile):
             self._write_file(filename)
             self._ini[self._path]=os.path.dirname(filename)
             self._write_ini()
+            self.disable()
 
     def add_filename(self,filename):
         self._filename=filename
