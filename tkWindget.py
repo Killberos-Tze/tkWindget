@@ -518,8 +518,4 @@ class AppFrame(Frame):
             self.approot.mainloop()
 
     def write_ini(self):
-        tmp=self.ini.pop('error')
         Write_to.ini_inst_proj(self.file,self.ini)
-        self.ini['error']=tmp
-
-
