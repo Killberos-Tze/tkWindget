@@ -6,8 +6,8 @@ Created on Tue Feb 28 07:37:01 2023
 @author: tze
 """
 
-from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar, IntVar, DISABLED, NORMAL
-from tkinter.filedialog import askopenfilename,asksaveasfilename
+from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar, IntVar, DISABLED, NORMAL,Canvas,Scrollbar
+from tkinter.filedialog import askopenfilename,asksaveasfilename,askopenfilenames
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from PIL import ImageTk, Image
@@ -165,19 +165,22 @@ class LabelFrame(Frame):
 
 #you need to add full list of kwargs in init 
 class OnOffButton(Frame):
-    def __init__(self,*args, parent=None, images=['on.png','off.png'],imageon=None, imageoff=None, imagepath=os.path.join(os.path.dirname(__file__), 'images'), command=None, commandon=None, commandoff=None, width=10):
+    def __init__(self,*args, parent=None, images=['on.png','off.png'],imageon=None, imageoff=None, imagepath=os.path.join(os.path.dirname(__file__), 'images'), command=None, commandon=None, commandoff=None, disable_enable=None, right_click=False, width=10):
         if command==None:
             command=self.placeholder
         if commandon==None:
             commandon=self.placeholder
         if commandoff==None:
             commandoff=self.placeholder
+        if disable_enable==None:
+            disable_enable=self.placeholder
         super().__init__(parent)
         self.parent=self
         self._imagepath=imagepath
         self.command=command
         self.commandon=commandon
         self.commandoff=commandoff
+        self.disable_enable=disable_enable
         self._state='off'
         self._enable=False
         self.images={
@@ -191,6 +194,23 @@ class OnOffButton(Frame):
         
         self.button=Button(self.parent, image=self.images[self._state], command=self.execute_press)
         self.button.grid(row=1,column=1)
+
+        if right_click:
+            self.button.bind('<Enter>', self._bound_to_click)
+            self.button.bind('<Leave>', self._unbound_to_click)
+
+    def _bound_to_click(self,event):
+        self.button.bind_all("<Button-3>", self._on_mouseclick)
+
+    def _unbound_to_click(self,event):
+        self.button.unbind_all("<Button-3>")
+
+    def _on_mouseclick(self,event):
+        if self.is_enabled():
+            self.disable_press()
+        else:
+            self.enable_press()
+        self.disable_enable()
 
     def on_off_config(self,state):
         self.button.config(state=state)
@@ -226,12 +246,16 @@ class OnOffButton(Frame):
 
     def placeholder(self,*args):
         pass
-    
+
 class CheckBox(OnOffButton):
     def __init__(self,*args, text='', textvariable=StringVar, orientation='EW',**kwargs):
         super().__init__(*args,imageon='box_on.png', imageoff='box_off.png',**kwargs)
-        self.images['on_disabled']=ImageTk.PhotoImage(Image.open(os.path.join(self._imagepath,'box_on_disabled.png')))
-        self.images['off_disabled']=ImageTk.PhotoImage(Image.open(os.path.join(self._imagepath,'box_off_disabled.png')))
+        if kwargs['right_click']:
+            self.images['on_disabled']=ImageTk.PhotoImage(Image.open(os.path.join(self._imagepath,'box_x.png')))
+            self.images['off_disabled']=ImageTk.PhotoImage(Image.open(os.path.join(self._imagepath,'box_x.png')))
+        else:
+            self.images['on_disabled']=ImageTk.PhotoImage(Image.open(os.path.join(self._imagepath,'box_on_disabled.png')))
+            self.images['off_disabled']=ImageTk.PhotoImage(Image.open(os.path.join(self._imagepath,'box_off_disabled.png')))
         self.label=LabelFrame(parent=self.parent,text=text,textvariable=textvariable)
         if orientation=='WE':
             self.label.grid(row=1,column=0)
@@ -258,6 +282,181 @@ class CheckBox(OnOffButton):
     def disable_press(self):
         self._enable=False
         self.button.config(image=self.images[self._state+'_disabled'])
+
+class ScrollFrame(Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.parent=self
+        self.row=0
+        # Canvas for scrolling
+        self.canvas = Canvas(self.parent, borderwidth=0, background="#f0f0f0",width=150,height=100)
+        self.frame_inside = Frame(self.canvas, background="#f0f0f0")
+
+        # Vertical scrollbar
+        self.v_scrollbar = Scrollbar(self.parent, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.v_scrollbar.set)
+
+        self.x_scrollbar = Scrollbar(self.parent, orient="horizontal", command=self.canvas.xview)
+        self.canvas.configure(xscrollcommand=self.x_scrollbar.set)
+
+        # Pack the scrollbar and canvas
+        #self.v_scrollbar.pack(side="right", fill="y")
+        #self.x_scrollbar.pack(side="top", fill="x")
+        #self.canvas.pack(side="left", fill="both", expand=True)
+        self.v_scrollbar.grid(row=1,column=1,sticky='NS')
+        self.x_scrollbar.grid(row=0,column=0,sticky='EW')
+        self.canvas.grid(row=1, column=0)
+
+        # Embed the inner frame into the canvas
+        self.canvas.create_window((4, 4), window=self.frame_inside, anchor="nw", tags="self.frame_inside")
+
+        # Bind configure event to update scroll region
+        self.frame_inside.bind("<Configure>", self.on_frame_configure)
+        #Bind the mouse wheel
+        self.canvas.bind('<Enter>', self._bound_to_mousewheel)
+        self.canvas.bind('<Leave>', self._unbound_to_mousewheel)
+
+    def _bound_to_mousewheel(self, event):
+        #self.frame_inside.bind("<MouseWheel>", self._on_mousewheel)
+        self.frame_inside.bind_all("<Button-4>", self._on_mousewheel)
+        self.frame_inside.bind_all("<Button-5>", self._on_mousewheel)
+        self.frame_inside.bind_all("<Shift-Button-4>", self._on_mousewheel)
+        self.frame_inside.bind_all("<Shift-Button-5>", self._on_mousewheel)
+
+    def _unbound_to_mousewheel(self, event):
+        self.frame_inside.unbind_all("<Button-4>")
+        self.frame_inside.unbind_all("<Button-5>",)
+        self.frame_inside.unbind_all("<Shift-Button-4>")
+        self.frame_inside.unbind_all("<Shift-Button-5>")
+
+    def _on_mousewheel(self, event):
+        print(event)
+        if event.num==5 and event.state==1:
+            self.canvas.xview_scroll(1, "units")
+        elif event.num==4 and event.state==1:
+            self.canvas.xview_scroll(-1, "units")
+        elif event.num==5:
+            self.canvas.yview_scroll(1, "units")
+        elif event.num==4:
+            self.canvas.yview_scroll(-1, "units")
+
+    def place_element(self,element):
+        element.grid(row=self.row,column=1,sticky='W')
+        self.row+=1
+
+    #this is needed for element initialisation
+    def provide_parent(self):
+        return self.frame_inside
+
+    def on_frame_configure(self, event):
+        '''Reset the scroll region to encompass the inner frame'''
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def update_scroll_region(self):
+        "Update the canvas's scrollable region based on the contained frame's size"
+        self.update_idletasks() # Process pending GUI updates
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
+
+class LoadMultipleFiles(Frame):
+    def __init__(self,*args,parent=None,ini,write_ini=Write_to.ini_inst_proj,read=Read_from.ihtm,path='load_file_path',filetypes=[("All files","*.*")],**kwargs):
+        super().__init__(parent)
+        self.parent=self
+        self._init_variables()
+        self._init_references(ini,write_ini,read,filetypes,path)
+        self._prepare_elements()
+
+    def _init_references(self,ini,write_ini,read,filetypes,path):
+        self._filetypes=filetypes
+        self._write_ini=write_ini
+        self._ini=ini
+        self._read=read
+        self._path=path
+
+    def add_action(self,action):
+        self._action=action
+
+    def _action(self):
+        pass
+
+    def get_data(self):
+        return self._data
+
+    def get_mask(self):
+        return self._data_check
+
+    def _get_files(self):
+        filenames=askopenfilenames(title="Select files", initialdir=self._ini[self._path], filetypes=self._filetypes)
+        if filenames:#to check if anything has been read out
+            for filename in filenames:
+                if filename not in self._fullfilenames:
+                    tmp=self._read(filename)
+                    if tmp['error']=='':
+                        self._fullfilenames.append(filename)
+                        self._ini[self._path]=os.path.dirname(filename)
+                        self._write_ini()
+                        self._data.append(tmp)
+                        self._data_check.append(CheckBox(parent=self._list.provide_parent(),text=os.path.basename(filename),command=self._action,disable_enable=self._action,right_click=True))
+                        self._list.place_element(self._data_check[-1])
+                        self._list.update_scroll_region()
+                    else:
+                        self._errorlabel.grid()
+                        self._errorlabel.set_var(tmp['error'])
+                        self.after(2000,func=self._clear_label)
+                else:
+                    self._errorlabel.grid()
+                    self._errorlabel.set_var('File/s already loaded!')
+                    self.after(2000,func=self._clear_label)
+
+    def _clear_label(self):
+        self._errorlabel.clear()
+        self._errorlabel.grid_remove()
+
+    def _init_variables(self):
+        self._data=[]
+        self._data_check=[]
+        self._fullfilenames=[]
+
+    def clear_data(self):
+        self._data=[]
+        self._fullfilenames=[]
+        if len(self._data_check):
+            tmp=self._data_check.pop()
+            tmp.destroy()
+
+    def _prepare_elements(self):
+        self._load=Button(self.parent,text='Load\nfiles',command=self._get_files)
+        self._load.grid(row=0,column=0,sticky='EW')
+        self._remove=Button(self.parent,text='Remove right\nclicked',command=self._remove_files)
+        self._remove.grid(row=0,column=1,sticky='EW')
+        self._select=Button(self.parent,text='Select all',command=self._select_all)
+        self._select.grid(row=1,column=0,sticky='EW')
+        self._deselect=Button(self.parent,text='Select none',command=self._deselect_all)
+        self._deselect.grid(row=1,column=1,sticky='EW')
+        self._errorlabel=LabelFrame(parent=self.parent,width=24)
+        self._errorlabel.grid(row=2,column=0,columnspan=2,sticky='EW')
+        self._errorlabel.grid_remove()
+        self._list=ScrollFrame(self.parent)
+        self._list.grid(row=3,column=0,columnspan=2)
+
+    def _remove_files(self):
+        for i in range(len(self._data_check)-1,-1,-1):
+            if self._data_check[i].is_enabled()==False:
+                tmp=self._data_check.pop(i)
+                tmp.destroy()
+                self._data.pop(i)
+                self._fullfilenames.pop(i)
+        self._action()
+        self._list.update_scroll_region()
+
+    def _select_all(self):
+        for item in self._data_check:
+            if item.get_state()=='off':
+                item.execute_press()
+
+    def _deselect_all(self):
+        for item in self._data_check:
+            if item.get_state()=='on':
+                item.execute_press()
 
 #you need to add full list of kwargs in init
 class Rotate(Frame):
@@ -307,8 +506,6 @@ class Rotate(Frame):
         self.var.set(value);
     def get_var(self):
         return self.var.get();
-
-
 
 class FigureFrame(Frame):
     def __init__(self,*args, parent=None, figclass=Figure,figkwargs={},figsize=(8.5/2.54,6/2.54), axsize=(0.2,0.2,0.7,0.7)):
