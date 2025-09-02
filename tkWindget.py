@@ -330,7 +330,6 @@ class ScrollFrame(Frame):
         self.frame_inside.unbind_all("<Shift-Button-5>")
 
     def _on_mousewheel(self, event):
-        print(event)
         if event.num==5 and event.state==1:
             self.canvas.xview_scroll(1, "units")
         elif event.num==4 and event.state==1:
