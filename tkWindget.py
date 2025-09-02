@@ -250,7 +250,7 @@ class OnOffButton(Frame):
 class CheckBox(OnOffButton):
     def __init__(self,*args, text='', textvariable=StringVar, orientation='EW',right_click=False,**kwargs):
         super().__init__(*args,imageon='box_on.png', imageoff='box_off.png',**kwargs)
-        if kwargs['right_click']:
+        if right_click:
             self.images['on_disabled']=ImageTk.PhotoImage(Image.open(os.path.join(self._imagepath,'box_x.png')))
             self.images['off_disabled']=ImageTk.PhotoImage(Image.open(os.path.join(self._imagepath,'box_x.png')))
         else:
