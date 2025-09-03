@@ -51,10 +51,10 @@ class LoadSingleFile(Frame):
     def reset(self):
         self.reset_label()
         self.reset_data()
-    
+
     def reset_data(self):
         self.data=None
-        
+
     def reset_label(self):
         self.labelbutton.reset()
 
@@ -91,7 +91,7 @@ class LoadSingleFile(Frame):
 
     def enable(self):
         self.labelbutton.config(state=NORMAL)
-        
+
 class SaveSingleFile(LoadSingleFile):
     def __init__(self,*args,write=Write_to.data,filetypes=[("E60 tab sep file","*.dtsp")],**kwargs):
         super().__init__(*args,filetypes=filetypes,path='save_file_path',**kwargs)
@@ -107,7 +107,7 @@ class SaveSingleFile(LoadSingleFile):
 
     def add_filename(self,filename):
         self._filename=filename
-        
+
 class LabelButton(Button):
     def __init__(self,*args,textvariable=StringVar,**kwargs):
         if textvariable==StringVar:
@@ -180,7 +180,7 @@ class ErrorFrame(LabelFrame):
         super().set_var(string);
         self.after(2000,self.grid_remove)
 
-#you need to add full list of kwargs in init 
+#you need to add full list of kwargs in init
 class OnOffButton(Frame):
     def __init__(self,*args, parent=None, images=['on.png','off.png'],imageon=None, imageoff=None, imagepath=os.path.join(os.path.dirname(__file__), 'images'), command=None, commandon=None, commandoff=None, disable_enable=None, right_click=False, width=10):
         if command==None:
@@ -208,7 +208,7 @@ class OnOffButton(Frame):
             self.images['on']=ImageTk.PhotoImage(Image.open(os.path.join(imagepath,imageon)))
         if imageoff!=None:
             self.images['off']=ImageTk.PhotoImage(Image.open(os.path.join(imagepath,imageoff)))
-        
+
         self.button=Button(self.parent, image=self.images[self._state], command=self.execute_press)
         self.button.grid(row=1,column=1)
 
@@ -529,7 +529,7 @@ class FigureFrame(Frame):
         parent=self
 
         self.plot=figclass(**figkwargs)
-        if figclass==Figure:    
+        if figclass==Figure:
             self.plot.set_size_inches(figsize)
             self.plot.myaxes=self.plot.add_axes(axsize)
 
@@ -619,7 +619,7 @@ class IntEntry(StringEntry):
             except:
                 return False #it returns only true of false allowing or not allwing the insert action
         return True
-#integer with limited number of digits        
+#integer with limited number of digits
 class IntLimEntry(StringEntry):
     def __init__(self,*args, parent=None,textvariable=IntVar,inlen=3,**kwargs):
         super().__init__(*args, parent=parent,textvariable=textvariable,**kwargs)
@@ -704,7 +704,7 @@ class AppFrame(Frame):
         if parent==Tk:
             self.approot=parent()
             super().__init__(self.approot)
-            self.frameroot=self  
+            self.frameroot=self
         else:
             super().__init__(parent)
             self.frameroot=self
