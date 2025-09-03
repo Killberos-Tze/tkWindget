@@ -163,6 +163,23 @@ class LabelFrame(Frame):
     def reset(self):
         self.var.set(self.default);
 
+class ErrorFrame(LabelFrame):
+    def __init__(self,*args, parent=None, textvariable=StringVar, borderwidth=2,relief=SUNKEN,**kwargs):
+        super().__init__(*args, parent=parent, textvariable=textvariable, borderwidth=borderwidth,relief=relief,**kwargs)
+
+    def grid(self,**kwargs):
+        super().grid(**kwargs)
+        super().grid_remove()
+
+    def grid_remove(self):
+        super().grid_remove()
+        self.clear()
+
+    def set_var(self,string):
+        super().grid()
+        super().set_var(string);
+        self.after(2000,self.grid_remove)
+
 #you need to add full list of kwargs in init 
 class OnOffButton(Frame):
     def __init__(self,*args, parent=None, images=['on.png','off.png'],imageon=None, imageoff=None, imagepath=os.path.join(os.path.dirname(__file__), 'images'), command=None, commandon=None, commandoff=None, disable_enable=None, right_click=False, width=10):
