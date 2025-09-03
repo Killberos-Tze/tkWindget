@@ -334,17 +334,20 @@ class ScrollFrame(Frame):
         self.canvas.bind('<Leave>', self._unbound_to_mousewheel)
 
     def _bound_to_mousewheel(self, event):
-        #self.frame_inside.bind("<MouseWheel>", self._on_mousewheel)
+        self.frame_inside.bind_all("<MouseWheel>", self._on_mousewheel)
         self.frame_inside.bind_all("<Button-4>", self._on_mousewheel)
         self.frame_inside.bind_all("<Button-5>", self._on_mousewheel)
+        self.frame_inside.bind_all("<Shift-MouseWheel>", self._on_mousewheel)
         self.frame_inside.bind_all("<Shift-Button-4>", self._on_mousewheel)
         self.frame_inside.bind_all("<Shift-Button-5>", self._on_mousewheel)
 
     def _unbound_to_mousewheel(self, event):
         self.frame_inside.unbind_all("<Button-4>")
-        self.frame_inside.unbind_all("<Button-5>",)
+        self.frame_inside.unbind_all("<Button-5>")
+        self.frame_inside.unbind_all("<MouseWheel>")
         self.frame_inside.unbind_all("<Shift-Button-4>")
         self.frame_inside.unbind_all("<Shift-Button-5>")
+        self.frame_inside.unbind_all("<Shift-MouseWheel>")
 
     def _on_mousewheel(self, event):
         if event.num==5 and event.state==1:
@@ -355,6 +358,10 @@ class ScrollFrame(Frame):
             self.canvas.yview_scroll(1, "units")
         elif event.num==4:
             self.canvas.yview_scroll(-1, "units")
+        elif event.delta and event.state:
+            self.canvas.xview_scroll(int(-1*event.delta/120), "units")
+        elif event.delta:
+            self.canvas.yview_scroll(int(-1*event.delta/120), "units")
 
     def place_element(self,element):
         element.grid(row=self.row,column=1,sticky='W')
