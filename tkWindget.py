@@ -13,11 +13,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from PIL import ImageTk, Image
 from RW_data.RW_files import Write_to, Read_from
 import os
-#we need load file element: that is a button with a label where the name of the file is displayed
-#here we need to send the refrerence to error message, stringvar for display, we keep name and dir name of the loaded file, we need to send the command how to read the file, arrangement should always be vertical
-#button, label label text, label with filename
-
-#we need load files and clear files element: two buttons with labellist with sliders
 
 #this is only for loading data files
 class LoadSingleFile(Frame):
@@ -718,12 +713,21 @@ class AppFrame(Frame):
             self.approot=None
         self.ini=Read_from.ini_inst(file)
         self.file=file
+        init=False
         if self.ini['error']:
             self.ini={}
             self.ini['error']=''
+            init=True
+        if 'save_file_path' not in self.ini:
             self.ini['save_file_path']='Document'
-            self.ini['ref_file_path']='Documents'
-            self.ini['load_file_path']='Documents'
+            init=True
+        if 'load_file_path' not in self.ini:
+            self.ini['load_file_path']='Document'
+            init=True
+        if 'ref_file_path' not in self.ini:
+            self.ini['ref_file_path']='Document'
+            init=True
+        if init:
             self.write_ini()
 
     def __str__(self):
