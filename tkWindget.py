@@ -93,7 +93,7 @@ class SaveSingleFile(LoadSingleFile):
         self._write_file=write
     def _get_file(self,**kwargs):
         self.reset_label()
-        filename=asksaveasfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes, initialfile=f'{self._filename}.dtsp')
+        filename=asksaveasfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes, initialfile=f'{self._filename}.{self._filetypes[0][1]}'.replace('*.',''))
         if filename:#to check if anything has been read out
             self._write_file(filename)
             self._ini[self._path]=os.path.dirname(filename)
