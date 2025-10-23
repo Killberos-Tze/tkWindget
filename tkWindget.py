@@ -711,7 +711,7 @@ class AppFrame(Frame):
             super().__init__(parent)
             self.frameroot=self
             self.approot=None
-        self.ini=Read_from.ini_inst(file)
+        self.ini=Read_from.ini(file)
         self.file=file
         init=False
         if self.ini['error']:
