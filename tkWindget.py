@@ -89,12 +89,16 @@ class LoadSingleFile(Frame):
         self.labelbutton.config(state=NORMAL)
 
 class SaveSingleFile(LoadSingleFile):
-    def __init__(self,*args,write=Write_to.data,filetypes=[("E60 tab sep file","*.dtsp")],**kwargs):
+    def __init__(self,*args,write=Write_to.data,filetypes=[("E60 tab sep file","*.dtsp")],datetime=False,**kwargs):
         super().__init__(*args,filetypes=filetypes,path='save_file_path',**kwargs)
         self._write_file=write
+        self._datetime=datetime
     def _get_file(self,**kwargs):
         self.reset_label()
-        init_file=f'{datetime.now().strftime("%Y%m/%d_%H%M%S")}_{self._filename}.{self._filetypes[0][1]}'.replace('*.','')
+        if self._datetime:
+            init_file=f'{datetime.now().strftime("%Y%m/%d_%H%M%S")}_{self._filename}.{self._filetypes[0][1]}'.replace('*.','')
+        else:
+            init_file=f'{self._filename}.{self._filetypes[0][1]}'.replace('*.','')
         filename=asksaveasfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes, initialfile=init_file)
         if filename:#to check if anything has been read out
             self._write_file(filename)
