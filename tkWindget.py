@@ -711,6 +711,7 @@ class AppFrame(Frame):
             super().__init__(parent)
             self.frameroot=self
             self.approot=None
+        self.frameroot.bind("<1>", lambda event: event.widget.focus_set())
         self.ini=Read_from.ini(file)
         self.file=file
         init=False
@@ -738,7 +739,6 @@ class AppFrame(Frame):
             self.frameroot.pack(pady = (25,25), padx = (25,25))
             self.approot.title(str(self))
             self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
-            self.approot.bind("<1>", lambda event: event.widget.focus_set())
             self.approot.mainloop()
 
     def write_ini(self):
