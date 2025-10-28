@@ -13,6 +13,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 from PIL import ImageTk, Image
 from RW_data.RW_files import Write_to, Read_from
 import os
+from datetime import datetime
 
 #this is only for loading data files
 class LoadSingleFile(Frame):
@@ -93,7 +94,8 @@ class SaveSingleFile(LoadSingleFile):
         self._write_file=write
     def _get_file(self,**kwargs):
         self.reset_label()
-        filename=asksaveasfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes, initialfile=f'{self._filename}.{self._filetypes[0][1]}'.replace('*.',''))
+        init_file=f'{datetime.now().strftime("%Y%m/%d_%H%M%S")}_{self._filename}.{self._filetypes[0][1]}'.replace('*.','')
+        filename=asksaveasfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes, initialfile=init_file)
         if filename:#to check if anything has been read out
             self._write_file(filename)
             self._ini[self._path]=os.path.dirname(filename)
