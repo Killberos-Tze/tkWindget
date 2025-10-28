@@ -550,7 +550,7 @@ class FigureFrame(Frame):
         return 'Regular App Frame'
 
 class StringEntry(Frame):
-    def __init__(self,*args, parent=None,textvariable=StringVar,validate="key",selectbackground='#f00',**kwargs):
+    def __init__(self,*args, parent=None,textvariable=StringVar,validate="key",selectbackground='#f00',command=None,**kwargs):
         super().__init__(parent)
         parent=self
         if textvariable in [StringVar, DoubleVar, IntVar]:
@@ -563,10 +563,21 @@ class StringEntry(Frame):
         else:
             self.default=''
         self.reset()
-
+        if command==None:
+            self._command=self._placeholder
+        else:
+            self._command=command
         self.Entry=Entry(parent,textvariable=self.var,validate=validate,selectbackground=selectbackground,**kwargs)
         self.Entry['validatecommand']=(self.Entry.register(self.Check_input), '%P','%d')
+        self.Entry.bind('<Return>',self._action)
         self.Entry.grid(row=1,column=1)
+
+    def _placeholder(self):
+        pass
+
+    def _action(self,event):
+        self._command()
+        self.focus()
 
     def set_var(self,string):
         self.var.set(string);
