@@ -96,7 +96,7 @@ class SaveSingleFile(LoadSingleFile):
     def _get_file(self,**kwargs):
         self.reset_label()
         if self._datetime:
-            init_file=f'{datetime.now().strftime("%Y%m/%d_%H%M%S")}_{self._filename}.{self._filetypes[0][1]}'.replace('*.','')
+            init_file=f'{datetime.now().strftime("%Y%m%d_%H%M%S")}_{self._filename}.{self._filetypes[0][1]}'.replace('*.','')
         else:
             init_file=f'{self._filename}.{self._filetypes[0][1]}'.replace('*.','')
         filename=asksaveasfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes, initialfile=init_file)
