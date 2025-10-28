@@ -92,19 +92,22 @@ class SaveSingleFile(LoadSingleFile):
     def __init__(self,*args,write=Write_to.data,filetypes=[("E60 tab sep file","*.dtsp")],datetime=False,**kwargs):
         super().__init__(*args,filetypes=filetypes,path='save_file_path',**kwargs)
         self._write_file=write
-        self._datetime=datetime
+        self._dateflag=datetime
+        self._date_time=''
     def _get_file(self,**kwargs):
         self.reset_label()
-        if self._datetime:
-            init_file=f'{datetime.now().strftime("%Y%m%d_%H%M%S")}_{self._filename}.{self._filetypes[0][1]}'.replace('*.','')
-        else:
-            init_file=f'{self._filename}.{self._filetypes[0][1]}'.replace('*.','')
+        if self._dateflag:
+            self._data_time=datetime.now().strftime("%Y%M%D_%H%M%S_")
+        init_file=f'{self._date_time}{self._filename}.{self._filetypes[0][1]}'.replace('*.','')
         filename=asksaveasfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes, initialfile=init_file)
         if filename:#to check if anything has been read out
-            self._write_file(filename)
             self._ini[self._path]=os.path.dirname(filename)
             self._write_ini()
             self.disable()
+            self._write_file(filename)
+
+    def add_datetime(self,datetime):
+        self._date_time=datetime
 
     def add_filename(self,filename):
         self._filename=filename
