@@ -570,6 +570,7 @@ class StringEntry(Frame):
         self.Entry=Entry(parent,textvariable=self.var,validate=validate,selectbackground=selectbackground,**kwargs)
         self.Entry['validatecommand']=(self.Entry.register(self.Check_input), '%P','%d')
         self.Entry.bind('<Return>',self._action)
+        self.Entry.bind('<FocusOut>',self._action)
         self.Entry.grid(row=1,column=1)
 
     def _placeholder(self):
