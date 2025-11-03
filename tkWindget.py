@@ -34,6 +34,7 @@ class LoadSingleFile(Frame):
     def _init_references(self,ini,write_ini,read,filetypes,path):
         self._filetypes=filetypes
         self._write_ini=write_ini
+        self._filetype=StringVar()
         self._ini=ini
         self._read=read
         self._path=path
@@ -59,7 +60,7 @@ class LoadSingleFile(Frame):
         self.labelbutton.grid(row=1,column=1)
 
     def _load_data(self,filename):
-        self.data=self._read(filename)
+        self.data=self._read(filename,filetype=self._filetype.get())
         if self.data['error']=='':
             self.labelbutton.set_var(os.path.basename(filename))
             self._ini[self._path]=os.path.dirname(filename)
@@ -72,7 +73,7 @@ class LoadSingleFile(Frame):
 
     def _get_file(self):
         self.reset_label()
-        filename=askopenfilename(title="Select file", initialdir=self._ini[self._path], filetypes=self._filetypes)
+        filename=askopenfilename(title="Select file", initialdir=self._ini[self._path], typevariable=self._filetype, filetypes=self._filetypes)
         if filename:#to check if anything has been read out
             self._load_data(filename)
         else:
@@ -398,6 +399,7 @@ class LoadMultipleFiles(Frame):
         self._ini=ini
         self._read=read
         self._path=path
+        self._filetype=StringVar()
 
     def add_action(self,action):
         self._action=action
@@ -412,7 +414,7 @@ class LoadMultipleFiles(Frame):
         return self._data_check
 
     def _get_files(self):
-        filenames=askopenfilenames(title="Select files", initialdir=self._ini[self._path], filetypes=self._filetypes)
+        filenames=askopenfilenames(title="Select files", initialdir=self._ini[self._path], typevariable=self._filetype, filetypes=self._filetypes)
         if filenames:#to check if anything has been read out
             for filename in filenames:
                 if filename not in self._fullfilenames:
