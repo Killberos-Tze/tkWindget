@@ -418,7 +418,7 @@ class LoadMultipleFiles(Frame):
         if filenames:#to check if anything has been read out
             for filename in filenames:
                 if filename not in self._fullfilenames:
-                    tmp=self._read(filename,self._filetype.get_var())
+                    tmp=self._read(filename,self._filetype.get())
                     if tmp['error']=='':
                         self._fullfilenames.append(filename)
                         self._ini[self._path]=os.path.dirname(filename)
