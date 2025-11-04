@@ -45,6 +45,9 @@ class LoadSingleFile(Frame):
     def get_data(self):#it returns the pointer
         return self.data
 
+    def get_filetype(self):
+        return self._filetype.get()
+
     def reset(self):
         self.reset_label()
         self.reset_data()
