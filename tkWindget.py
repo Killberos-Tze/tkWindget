@@ -767,5 +767,9 @@ class AppFrame(Frame):
             self.approot.geometry('%dx%d+%d+%d' % self.appgeometry)
             self.approot.mainloop()
 
+    def clear_frameroot(self):
+        for widget in self.frameroot.winfo_children():
+            widget.destroy()
+
     def write_ini(self):
         Write_to.ini_inst_proj(self.file,self.ini)
