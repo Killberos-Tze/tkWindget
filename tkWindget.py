@@ -6,7 +6,7 @@ Created on Tue Feb 28 07:37:01 2023
 @author: tze
 """
 
-from tkinter import Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar, IntVar, DISABLED, NORMAL,Canvas,Scrollbar
+from tkinter import Listbox, Frame, Button, Label, GROOVE, StringVar, Tk, SUNKEN, Entry, DoubleVar, IntVar, DISABLED, NORMAL,Canvas,Scrollbar
 from tkinter.filedialog import askopenfilename,asksaveasfilename,askopenfilenames
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -14,6 +14,111 @@ from PIL import ImageTk, Image
 from RW_data.RW_files import Write_to, Read_from
 import os
 from datetime import datetime
+from tkinter import END
+
+class HeaderListBox(Frame):
+    def __init__(self,*args,parent=None,**kwargs):
+        super().__init__(parent)
+        tmp=self
+        self._prepare_elements(tmp)
+
+    def set_title(self,string):
+        self._titlevar.set(string)
+
+    def clear_title(self):
+        self.set_title('')
+
+    def _prepare_elements(self,tmpframe):
+        self._rowindex=[]
+        self._titlevar=StringVar()
+        self._titlevar.set("Provide a title with insert_title function")
+        label=Label(tmpframe, textvariable=self._titlevar, font='Courier', borderwidth=2,relief=GROOVE, width=45)
+        label.grid(row=1,column=1)
+        self.headerbox=Listbox(tmpframe, font='Courier',width=45,height=1)
+        self.headerbox.grid(row = 2, column = 1)
+        self.listbox=Listbox(tmpframe, font='Courier', selectbackground='red', selectmode='extended',width=45)#https://stackoverflow.com/questions/51376597/how-can-i-shift-select-multiple-items-in-tkinter-listbox
+        self.listbox.grid(row = 4, column = 1, rowspan=4)
+        self.listbox.bind("<Leave>",self.refocus)
+        self.xscrollbar=Scrollbar(tmpframe,orient='horizontal')
+        self.xscrollbar.grid(row = 3, column = 1, sticky='WE')
+        self.yscrollbar=Scrollbar(tmpframe)
+        self.yscrollbar.grid(row = 4, column = 2, rowspan=4, sticky='NS')
+        self.listbox.config(yscrollcommand = self.yscrollbar.set)
+        self.listbox.config(xscrollcommand = self.xscrollbar.set)
+        self.headerbox.config(xscrollcommand = self.xscrollbar.set)
+        self.headerbox.bind("<Leave>",self.refocus)
+        self.yscrollbar.config(command = self.listbox.yview)
+        self.xscrollbar.config(command = self.OnVsb)
+        self.headerbox.bind("<Shift-MouseWheel>", self._on_mousewheel)
+        self.headerbox.bind("<Shift-Button-4>", self._on_mousewheel)
+        self.headerbox.bind("<Shift-Button-5>", self._on_mousewheel)
+        self.listbox.bind("<Shift-MouseWheel>", self._on_mousewheel)
+        self.listbox.bind("<Shift-Button-4>", self._on_mousewheel)
+        self.listbox.bind("<Shift-Button-5>", self._on_mousewheel)
+# =============================================================================
+#         https://stackoverflow.com/questions/4066974/scrolling-multiple-tkinter-listboxes-together
+# =============================================================================
+
+    def OnVsb(self, *args):
+        self.headerbox.xview(*args)
+        self.listbox.xview(*args)
+
+    def _on_mousewheel(self, event):
+        if event.num==5 and event.state==1:
+            self.listbox.xview_scroll(5, "units")
+            self.headerbox.xview_scroll(5, "units")
+        elif event.num==4 and event.state==1:
+            self.listbox.xview_scroll(-5, "units")
+            self.headerbox.xview_scroll(-5, "units")
+        elif event.delta and event.state:
+            self.listbox.xview_scroll(int(-5*event.delta/120), "units")
+            self.headerbox.xview_scroll(int(-5*event.delta/120), "units")
+        return "break"
+
+    def refocus(self,event):
+        self.master.focus()
+
+    def clear_header(self):
+        self.headerbox.delete(0,END)
+
+    def set_header(self,string):
+        self.clear_header()
+        self.headerbox.insert(0,string)
+
+    def clear_list(self):
+        self.listbox.delete(0,END)
+        self._rowindex=[]
+
+    def clear_list_selection(self):
+        self.listbox.selection_clear(0,END)
+
+    def delete_list_selection(self):
+        selected_rows=[item for item in self.listbox.curselection()]
+        selected_rows.sort(reverse=True)
+        for item in selected_rows:
+            self.listbox.delete(item)
+            self._rowindex.pop(item)
+        #self.master.update()
+
+    def insert_row(self,string):
+        self.listbox.insert(len(self._rowindex),string)
+        if len(self._rowindex)==0:
+            self._rowindex.append(0)
+        else:
+            self._rowindex.append(self._rowindex[-1]+1)
+
+    def insert_rows(self,string_list):
+        for item in string_list:
+            self.insert_row(item)
+        print(self._rowindex)
+        #self.master.update()
+
+    def insert_index_rows(self,string_list,index_list):
+        self.clear_list()
+        self._rowindex=[item for item in index_list]
+        for idx,item in enumerate(string_list):
+            self.listbox.insert(idx,item)
+        #self.master.update()
 
 #this is only for loading data files
 class LoadSingleFile(Frame):
