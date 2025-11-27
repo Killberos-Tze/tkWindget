@@ -93,31 +93,36 @@ class HeaderListBox(Frame):
         self.listbox.selection_clear(0,END)
 
     def delete_list_selection(self):
+        to_delete=[]
         selected_rows=[item for item in self.listbox.curselection()]
         selected_rows.sort(reverse=True)
         for item in selected_rows:
             self.listbox.delete(item)
-            self._rowindex.pop(item)
+            to_delete.append(self._rowindex.pop(item))
+        print(to_delete)
+        return to_delete
         #self.master.update()
-
-    def insert_row(self,string):
+#to add single row at the list end
+    def add_row(self,string):
         self.listbox.insert(len(self._rowindex),string)
         if len(self._rowindex)==0:
             self._rowindex.append(0)
         else:
             self._rowindex.append(self._rowindex[-1]+1)
-
-    def insert_rows(self,string_list):
+#to add multiple rows at the list end
+    def add_rows(self,string_list):
         for item in string_list:
-            self.insert_row(item)
-        print(self._rowindex)
+            self.add_row(item)
         #self.master.update()
-
-    def insert_index_rows(self,string_list,index_list):
+#to init list with of without predefined index_list
+    def init_index_rows(self,string_list,index_list=None):
         self.clear_list()
-        self._rowindex=[item for item in index_list]
-        for idx,item in enumerate(string_list):
-            self.listbox.insert(idx,item)
+        if index_list==None:
+            self.add_rows(string_list)
+        else:
+            self._rowindex=[item for item in index_list]
+            for idx,item in enumerate(string_list):
+                self.listbox.insert(idx,item)
         #self.master.update()
 
 #this is only for loading data files
