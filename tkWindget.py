@@ -94,10 +94,8 @@ class HeaderListBox(Frame):
 
     def get_selected(self):
         selected=[]
-        selected_rows=[item for item in self.listbox.curselection()]
-        selected_rows.sort(reverse=True)
-        for item in selected_rows:
-            selected.append(self._rowindex.pop(item))
+        for item in self.listbox.curselection():
+            selected.append(self._rowindex[item])
         return selected
 
     def delete_selected(self):
