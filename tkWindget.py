@@ -89,19 +89,27 @@ class HeaderListBox(Frame):
         self.listbox.delete(0,END)
         self._rowindex=[]
 
-    def clear_list_selection(self):
+    def clear_selected(self):
         self.listbox.selection_clear(0,END)
 
-    def delete_list_selection(self):
+    def get_selected(self):
+        selected=[]
+        selected_rows=[item for item in self.listbox.curselection()]
+        selected_rows.sort(reverse=True)
+        for item in selected_rows:
+            selected.append(self._rowindex.pop(item))
+        return selected
+
+    def delete_selected(self):
         to_delete=[]
         selected_rows=[item for item in self.listbox.curselection()]
         selected_rows.sort(reverse=True)
         for item in selected_rows:
             self.listbox.delete(item)
             to_delete.append(self._rowindex.pop(item))
-        print(to_delete)
+        #print(to_delete)
         return to_delete
-        #self.master.update()
+
 #to add single row at the list end
     def add_row(self,string):
         self.listbox.insert(len(self._rowindex),string)
