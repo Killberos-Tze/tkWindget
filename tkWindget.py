@@ -95,7 +95,7 @@ class HeaderListBox(Frame):
     def get_selected(self):
         selected=[]
         for item in self.listbox.curselection():
-            selected.append(self._rowindex[item])
+            selected.append((item,self._rowindex[item]))
         return selected
 
     def delete_selected(self):
@@ -104,8 +104,7 @@ class HeaderListBox(Frame):
         selected_rows.sort(reverse=True)
         for item in selected_rows:
             self.listbox.delete(item)
-            to_delete.append(self._rowindex.pop(item))
-        #print(to_delete)
+            to_delete.append((item,self._rowindex.pop(item)))
         return to_delete
 
 #to add single row at the list end
